@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format, parse } from "date-fns";
+import { format, isValid, parse } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -22,9 +22,23 @@ import { toast } from "sonner";
 import useFetch from "@/hooks/use-fetch";
 
 const formatDisplayDate = (dateString) => {
-  if (!dateString) return "";
-  const date = parse(dateString, "yyyy-MM", new Date());
-  return format(date, "MMM yyyy");
+  if (!dateString || typeof dateString !== "string") return "";
+
+  try {
+    if (/^\d{4}-\d{2}$/.test(dateString)) {
+      const monthInputDate = parse(dateString, "yyyy-MM", new Date());
+      return isValid(monthInputDate) ? format(monthInputDate, "MMM yyyy") : "";
+    }
+
+    if (/^[A-Za-z]{3}\s\d{4}$/.test(dateString)) {
+      const displayDate = parse(dateString, "MMM yyyy", new Date());
+      return isValid(displayDate) ? dateString : "";
+    }
+
+    return "";
+  } catch {
+    return "";
+  }
 };
 
 export function EntryForm({ type, entries, onChange }) {

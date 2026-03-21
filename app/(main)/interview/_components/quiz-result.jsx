@@ -12,6 +12,9 @@ export default function QuizResult({
 }) {
   if (!result) return null;
 
+  const score = typeof result.quizScore === "number" ? result.quizScore : 0;
+  const questions = Array.isArray(result.questions) ? result.questions : [];
+
   return (
     <div className="mx-auto">
       <h1 className="flex items-center gap-2 text-3xl gradient-title">
@@ -22,8 +25,8 @@ export default function QuizResult({
       <CardContent className="space-y-6">
         {/* Score Overview */}
         <div className="text-center space-y-2">
-          <h3 className="text-2xl font-bold">{result.quizScore.toFixed(1)}%</h3>
-          <Progress value={result.quizScore} className="w-full" />
+          <h3 className="text-2xl font-bold">{score.toFixed(1)}%</h3>
+          <Progress value={score} className="w-full" />
         </div>
 
         {/* Improvement Tip */}
@@ -37,7 +40,7 @@ export default function QuizResult({
         {/* Questions Review */}
         <div className="space-y-4">
           <h3 className="font-medium">Question Review</h3>
-          {result.questions.map((q, index) => (
+          {questions.map((q, index) => (
             <div key={index} className="border rounded-lg p-4 space-y-2">
               <div className="flex items-start justify-between gap-2">
                 <p className="font-medium">{q.question}</p>

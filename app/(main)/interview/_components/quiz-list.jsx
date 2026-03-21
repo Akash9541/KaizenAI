@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { format } from "date-fns";
+import { format, isValid } from "date-fns";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +18,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import QuizResult from "./quiz-result";
+
+const formatAssessmentDate = (value) => {
+  if (!value) return "Unknown date";
+
+  const date = new Date(value);
+  return isValid(date) ? format(date, "MMMM dd, yyyy HH:mm") : "Unknown date";
+};
 
 export default function QuizList({ assessments }) {
   const router = useRouter();
@@ -54,13 +61,14 @@ export default function QuizList({ assessments }) {
                     Quiz {i + 1}
                   </CardTitle>
                   <CardDescription className="flex justify-between w-full">
-                    <div>Score: {assessment.quizScore.toFixed(1)}%</div>
                     <div>
-                      {format(
-                        new Date(assessment.createdAt),
-                        "MMMM dd, yyyy HH:mm"
-                      )}
+                      Score:{" "}
+                      {typeof assessment.quizScore === "number"
+                        ? assessment.quizScore.toFixed(1)
+                        : "0.0"}
+                      %
                     </div>
+                    <div>{formatAssessmentDate(assessment.createdAt)}</div>
                   </CardDescription>
                 </CardHeader>
                 {assessment.improvementTip && (

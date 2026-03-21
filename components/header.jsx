@@ -24,15 +24,18 @@ export default async function Header() {
 
   return (
     <header className="fixed top-0 w-full border-b bg-background/80 backdrop-blur-md z-50 supports-[backdrop-filter]:bg-background/60">
-      <nav className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/">
-          <Image
-            src={"/logo.png"}
-            alt="Sensai Logo"
-            width={200}
-            height={60}
-            className="h-12 py-1 w-auto object-contain"
-          />
+      <nav className="container mx-auto flex h-24 items-center justify-between px-4">
+        <Link href="/" className="flex items-center">
+          <div className="flex h-14 items-center overflow-hidden md:h-16">
+            <Image
+              src="/Logo.png"
+              alt="KaizenAI Logo"
+              width={320}
+              height={160}
+              className="-translate-y-1 h-20 w-auto max-w-none object-contain md:h-24"
+              priority
+            />
+          </div>
         </Link>
 
         {/* Action Buttons */}

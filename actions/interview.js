@@ -2,10 +2,8 @@
 
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+import { getGeminiModel } from "@/lib/gemini";
+import { syncUser } from "@/lib/checkUser";
 
 export async function generateQuiz() {
   const { userId } = await auth();
@@ -44,7 +42,7 @@ export async function generateQuiz() {
   `;
 
   try {
-    const result = await model.generateContent(prompt);
+    const result = await getGeminiModel().generateContent(prompt);
     const response = result.response;
     const text = response.text();
     const cleanedText = text.replace(/```(?:json)?\n?/g, "").trim();
@@ -100,7 +98,9 @@ export async function saveQuizResult(questions, answers, score) {
     `;
 
     try {
-      const tipResult = await model.generateContent(improvementPrompt);
+      const tipResult = await getGeminiModel().generateContent(
+        improvementPrompt
+      );
 
       improvementTip = tipResult.response.text().trim();
       console.log(improvementTip);
@@ -132,11 +132,12 @@ export async function getAssessments() {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
+  const user =
+    (await db.user.findUnique({
+      where: { clerkUserId: userId },
+    })) || (await syncUser());
 
-  if (!user) throw new Error("User not found");
+  if (!user) return [];
 
   try {
     const assessments = await db.assessment.findMany({
@@ -151,6 +152,6 @@ export async function getAssessments() {
     return assessments;
   } catch (error) {
     console.error("Error fetching assessments:", error);
-    throw new Error("Failed to fetch assessments");
+    return [];
   }
 }

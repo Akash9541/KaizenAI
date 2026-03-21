@@ -5,7 +5,8 @@ export default function StatsCards({ assessments }) {
   const getAverageScore = () => {
     if (!assessments?.length) return 0;
     const total = assessments.reduce(
-      (sum, assessment) => sum + assessment.quizScore,
+      (sum, assessment) =>
+        sum + (typeof assessment.quizScore === "number" ? assessment.quizScore : 0),
       0
     );
     return (total / assessments.length).toFixed(1);
@@ -19,10 +20,13 @@ export default function StatsCards({ assessments }) {
   const getTotalQuestions = () => {
     if (!assessments?.length) return 0;
     return assessments.reduce(
-      (sum, assessment) => sum + assessment.questions.length,
+      (sum, assessment) =>
+        sum + (Array.isArray(assessment.questions) ? assessment.questions.length : 0),
       0
     );
   };
+
+  const latestScore = getLatestAssessment();
 
   return (
     <div className="grid gap-4 md:grid-cols-3">
@@ -59,7 +63,10 @@ export default function StatsCards({ assessments }) {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {getLatestAssessment()?.quizScore.toFixed(1) || 0}%
+            {typeof latestScore?.quizScore === "number"
+              ? latestScore.quizScore.toFixed(1)
+              : 0}
+            %
           </div>
           <p className="text-xs text-muted-foreground">Most recent quiz</p>
         </CardContent>

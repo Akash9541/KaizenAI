@@ -17,7 +17,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useEffect, useState } from "react";
-import { format } from "date-fns";
+import { format, isValid } from "date-fns";
+
+const formatAssessmentDate = (value) => {
+  if (!value) return "Unknown";
+
+  const date = new Date(value);
+  return isValid(date) ? format(date, "MMM dd") : "Unknown";
+};
 
 export default function PerformanceChart({ assessments }) {
   const [chartData, setChartData] = useState([]);
@@ -25,8 +32,9 @@ export default function PerformanceChart({ assessments }) {
   useEffect(() => {
     if (assessments) {
       const formattedData = assessments.map((assessment) => ({
-        date: format(new Date(assessment.createdAt), "MMM dd"),
-        score: assessment.quizScore,
+        date: formatAssessmentDate(assessment.createdAt),
+        score:
+          typeof assessment.quizScore === "number" ? assessment.quizScore : 0,
       }));
       setChartData(formattedData);
     }
