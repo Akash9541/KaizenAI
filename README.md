@@ -1,11 +1,32 @@
-# Full Stack AI Career Coach with Next JS, Neon DB, Tailwind, Prisma, Inngest, Shadcn UI Tutorial 🔥🔥
-## https://youtu.be/UbXpRv5ApKA
+# KaizenAI
 
-![sensai](https://github.com/user-attachments/assets/eee79242-4056-4d19-b655-2873788979e1)
+KaizenAI is an AI-powered career coach that helps users with:
+- personalized industry insights
+- resume building
+- cover letter generation
+- interview preparation and progress tracking
 
-### Make sure to create a `.env` file with following variables -
+## Tech Stack
 
-```
+- Next.js 15
+- React 19
+- Tailwind CSS
+- shadcn/ui
+- Clerk Authentication
+- Prisma ORM
+- PostgreSQL / Neon
+- Gemini API
+- Inngest
+
+## Coding Profile
+
+- GitHub: [Akash9541](https://github.com/Akash9541)
+
+## Environment Variables
+
+Create a `.env` file with:
+
+```env
 DATABASE_URL=
 
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
@@ -17,4 +38,21 @@ NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/onboarding
 NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/onboarding
 
 GEMINI_API_KEY=
+GEMINI_MODEL=gemini-2.5-flash
+```
+
+## Run Locally
+
+```bash
+npm install
+npx prisma generate
+npx prisma db push
+npm run dev
+```
+
+## Production Build
+
+```bash
+npm run build
+npm run start
 ```
