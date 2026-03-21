@@ -56,8 +56,11 @@ export default function ResumeBuilder({ initialContent }) {
     error: saveError,
   } = useFetch(saveResume);
 
-  // Watch form fields for preview updates
   const formValues = watch();
+  const sanitizedPreviewContent = (previewContent ?? "").replace(
+    /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+    ""
+  );
 
   useEffect(() => {
     if (initialContent) setActiveTab("preview");
@@ -135,8 +138,8 @@ export default function ResumeBuilder({ initialContent }) {
   const onSubmit = async (data) => {
     try {
       const formattedContent = previewContent
-        .replace(/\n/g, "\n") // Normalize newlines
-        .replace(/\n\s*\n/g, "\n\n") // Normalize multiple newlines to double newlines
+        .replace(/\n/g, "\n")
+        .replace(/\n\s*\n/g, "\n\n")
         .trim();
 
       console.log(previewContent, formattedContent);
@@ -395,7 +398,7 @@ export default function ResumeBuilder({ initialContent }) {
           )}
           <div className="border rounded-lg">
             <MDEditor
-              value={previewContent}
+              value={sanitizedPreviewContent}
               onChange={setPreviewContent}
               height={800}
               preview={resumeMode}
@@ -404,7 +407,7 @@ export default function ResumeBuilder({ initialContent }) {
           <div className="hidden">
             <div id="resume-pdf">
               <MDEditor.Markdown
-                source={previewContent}
+                source={sanitizedPreviewContent}
                 style={{
                   background: "white",
                   color: "black",
