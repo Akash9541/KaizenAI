@@ -28,7 +28,7 @@ export default async function Header() {
         <Link href="/" className="flex items-center">
           <div className="flex h-14 items-center overflow-hidden md:h-16">
             <Image
-              src="/Logo.png"
+              src="/logo.png"
               alt="KaizenAI Logo"
               width={320}
               height={160}
