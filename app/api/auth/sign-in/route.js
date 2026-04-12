@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/prisma";
 import {
-  AUTH_COOKIE_NAME,
   comparePassword,
   createAuthToken,
   getAuthCookieOptions,
@@ -13,7 +12,7 @@ import {
   getLockState,
   recordFailedLoginAttempt,
 } from "@/lib/login-guard";
-import { PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH } from "@/lib/constants";
+import { PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH, AUTH_COOKIE_NAME } from "@/lib/constants";
 
 const signInSchema = z.object({
   email: z.string().email("Valid email is required"),

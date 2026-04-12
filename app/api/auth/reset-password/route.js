@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/prisma";
 import {
-  AUTH_COOKIE_NAME,
   createAuthToken,
   getAuthCookieOptions,
   hashOtpCode,
@@ -10,7 +9,7 @@ import {
 } from "@/lib/auth";
 import { checkRateLimit, rateLimiters } from "@/lib/rate-limit-redis";
 import { clearLoginAttempts } from "@/lib/login-guard";
-import { OTP_LENGTH, OTP_REGEX, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH } from "@/lib/constants";
+import { OTP_LENGTH, OTP_REGEX, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH, AUTH_COOKIE_NAME } from "@/lib/constants";
 
 const resetPasswordSchema = z
   .object({

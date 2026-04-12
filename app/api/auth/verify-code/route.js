@@ -2,13 +2,12 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/prisma";
 import {
-  AUTH_COOKIE_NAME,
   createAuthToken,
   getAuthCookieOptions,
   hashOtpCode,
 } from "@/lib/auth";
 import { checkRateLimit, rateLimiters } from "@/lib/rate-limit-redis";
-import { OTP_LENGTH, OTP_REGEX } from "@/lib/constants";
+import { OTP_LENGTH, OTP_REGEX, AUTH_COOKIE_NAME } from "@/lib/constants";
 
 const verifyCodeSchema = z.object({
   email: z.string().email("Valid email is required"),
