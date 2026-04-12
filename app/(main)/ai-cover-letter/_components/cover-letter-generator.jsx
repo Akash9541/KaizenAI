@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { ArrowRight, Loader2, Sparkles, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,6 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -22,7 +24,7 @@ import { coverLetterSchema } from "@/app/lib/schema";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-export default function CoverLetterGenerator() {
+export default function CoverLetterGenerator({ profileSummary }) {
   const router = useRouter();
 
   const {
@@ -47,7 +49,7 @@ export default function CoverLetterGenerator() {
       router.push(`/ai-cover-letter/${generatedLetter.id}`);
       reset();
     }
-  }, [generatedLetter]);
+  }, [generatedLetter, reset, router]);
 
   const onSubmit = async (data) => {
     try {
@@ -57,13 +59,81 @@ export default function CoverLetterGenerator() {
     }
   };
 
+  const hasProfileContext = Boolean(
+    profileSummary?.industry || profileSummary?.experience || profileSummary?.skills?.length
+  );
+
   return (
     <div className="space-y-6">
+      <div className="grid gap-4 lg:grid-cols-[1.4fr,0.9fr]">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <UserRound className="h-5 w-5" />
+              Profile Context
+            </CardTitle>
+            <CardDescription>
+              Your saved profile is used to tailor the generated letter.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex flex-wrap gap-2">
+              {profileSummary?.industry ? (
+                <Badge variant="secondary">{profileSummary.industry}</Badge>
+              ) : (
+                <Badge variant="outline">Industry not set</Badge>
+              )}
+              {typeof profileSummary?.experience === "number" && (
+                <Badge variant="secondary">
+                  {profileSummary.experience} years experience
+                </Badge>
+              )}
+              {profileSummary?.skills?.slice(0, 3).map((skill) => (
+                <Badge key={skill} variant="outline">
+                  {skill}
+                </Badge>
+              ))}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {hasProfileContext
+                ? "Your profile details and industry context will be blended into the draft automatically."
+                : "Complete your profile to make the generated cover letter more accurate and personalized."}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5" />
+              Quick Access
+            </CardTitle>
+            <CardDescription>
+              Update the supporting context without leaving your workflow.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-3">
+            <Link href="/onboarding?edit=true">
+              <Button variant="outline" className="w-full justify-between">
+                Edit Profile
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+            <Link href="/dashboard">
+              <Button variant="outline" className="w-full justify-between">
+                View Industry Insights
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle>Job Details</CardTitle>
           <CardDescription>
-            Provide information about the position you&apos;re applying for
+            Provide the role details and we&apos;ll draft a letter using your saved profile plus the job description.
           </CardDescription>
         </CardHeader>
         <CardContent>

@@ -30,9 +30,40 @@ import useFetch from "@/hooks/use-fetch";
 import { onboardingSchema } from "@/app/lib/schema";
 import { updateUser } from "@/actions/user";
 
-const OnboardingForm = ({ industries }) => {
+const slugify = (value) => value?.toLowerCase().replace(/ /g, "-");
+
+const getInitialIndustryValues = (industryValue, industries) => {
+  if (!industryValue) {
+    return {
+      industry: undefined,
+      subIndustry: undefined,
+      selectedIndustry: null,
+    };
+  }
+
+  const [industryId, ...subIndustryParts] = industryValue.split("-");
+  const subIndustrySlug = subIndustryParts.join("-");
+  const selectedIndustry = industries.find((industry) => industry.id === industryId);
+  const matchingSubIndustry = selectedIndustry?.subIndustries.find(
+    (subIndustry) => slugify(subIndustry) === subIndustrySlug
+  );
+
+  return {
+    industry: industryId,
+    subIndustry: matchingSubIndustry,
+    selectedIndustry: selectedIndustry || null,
+  };
+};
+
+const OnboardingForm = ({ industries, initialValues, isEditing = false }) => {
   const router = useRouter();
-  const [selectedIndustry, setSelectedIndustry] = useState(null);
+  const initialSelection = getInitialIndustryValues(
+    initialValues?.industry,
+    industries
+  );
+  const [selectedIndustry, setSelectedIndustry] = useState(
+    initialSelection.selectedIndustry
+  );
 
   const {
     loading: updateLoading,
@@ -45,9 +76,20 @@ const OnboardingForm = ({ industries }) => {
     handleSubmit,
     formState: { errors },
     setValue,
-    watch,
   } = useForm({
     resolver: zodResolver(onboardingSchema),
+    defaultValues: {
+      industry: initialSelection.industry,
+      subIndustry: initialSelection.subIndustry,
+      experience:
+        typeof initialValues?.experience === "number"
+          ? String(initialValues.experience)
+          : "",
+      skills: Array.isArray(initialValues?.skills)
+        ? initialValues.skills.join(", ")
+        : "",
+      bio: initialValues?.bio || "",
+    },
   });
 
   const onSubmit = async (values) => {
@@ -67,24 +109,29 @@ const OnboardingForm = ({ industries }) => {
 
   useEffect(() => {
     if (updateResult?.success && !updateLoading) {
-      toast.success("Profile completed successfully!");
+      toast.success(
+        isEditing
+          ? "Profile updated successfully!"
+          : "Profile completed successfully!"
+      );
       router.push("/dashboard");
       router.refresh();
     }
-  }, [updateResult, updateLoading, router]);
+  }, [updateResult, updateLoading, router, isEditing]);
 
-  const watchIndustry = watch("industry");
+  const hasSelectedIndustry = Boolean(selectedIndustry);
 
   return (
     <div className="flex items-center justify-center bg-background">
       <Card className="w-full max-w-lg mt-10 mx-2">
         <CardHeader>
           <CardTitle className="gradient-title text-4xl">
-            Complete Your Profile
+            {isEditing ? "Edit Your Profile" : "Complete Your Profile"}
           </CardTitle>
           <CardDescription>
-            Select your industry to get personalized career insights and
-            recommendations.
+            {isEditing
+              ? "Update your profile details and keep your career recommendations fresh."
+              : "Select your industry to get personalized career insights and recommendations."}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -92,6 +139,7 @@ const OnboardingForm = ({ industries }) => {
             <div className="space-y-2">
               <Label htmlFor="industry">Industry</Label>
               <Select
+                defaultValue={initialSelection.industry}
                 onValueChange={(value) => {
                   setValue("industry", value);
                   setSelectedIndustry(
@@ -121,10 +169,11 @@ const OnboardingForm = ({ industries }) => {
               )}
             </div>
 
-            {watchIndustry && (
+            {hasSelectedIndustry && (
               <div className="space-y-2">
                 <Label htmlFor="subIndustry">Specialization</Label>
                 <Select
+                  defaultValue={initialSelection.subIndustry}
                   onValueChange={(value) => setValue("subIndustry", value)}
                 >
                   <SelectTrigger id="subIndustry">
@@ -201,7 +250,7 @@ const OnboardingForm = ({ industries }) => {
                   Saving...
                 </>
               ) : (
-                "Complete Profile"
+                isEditing ? "Save Profile" : "Complete Profile"
               )}
             </Button>
           </form>

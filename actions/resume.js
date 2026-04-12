@@ -1,19 +1,12 @@
 "use server";
 
 import { db } from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { getGeminiModel } from "@/lib/gemini";
+import { requireOnboardedUser } from "@/lib/onboarding";
 
 export async function saveResume(content) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-
-  if (!user) throw new Error("User not found");
+  const user = await requireOnboardedUser();
 
   try {
     const resume = await db.resume.upsert({
@@ -38,14 +31,7 @@ export async function saveResume(content) {
 }
 
 export async function getResume() {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-
-  if (!user) throw new Error("User not found");
+  const user = await requireOnboardedUser();
 
   return await db.resume.findUnique({
     where: {
@@ -55,20 +41,16 @@ export async function getResume() {
 }
 
 export async function improveWithAI({ current, type }) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
+  const user = await requireOnboardedUser({
     include: {
       industryInsight: true,
     },
   });
 
-  if (!user) throw new Error("User not found");
-
   const prompt = `
-    As an expert resume writer, improve the following ${type} description for a ${user.industry} professional.
+    As an expert resume writer, improve the following ${type} description for a ${
+      user.industry || "professional"
+    } professional.
     Make it more impactful, quantifiable, and aligned with industry standards.
     Current content: "${current}"
 

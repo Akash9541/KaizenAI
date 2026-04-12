@@ -43,13 +43,14 @@ const formatDisplayDate = (dateString) => {
 
 export function EntryForm({ type, entries, onChange }) {
   const [isAdding, setIsAdding] = useState(false);
+  const [isCurrent, setIsCurrent] = useState(false);
 
   const {
     register,
     handleSubmit: handleValidation,
     formState: { errors },
     reset,
-    watch,
+    getValues,
     setValue,
   } = useForm({
     resolver: zodResolver(entrySchema),
@@ -63,8 +64,6 @@ export function EntryForm({ type, entries, onChange }) {
     },
   });
 
-  const current = watch("current");
-
   const handleAdd = handleValidation((data) => {
     const formattedEntry = {
       ...data,
@@ -75,6 +74,7 @@ export function EntryForm({ type, entries, onChange }) {
     onChange([...entries, formattedEntry]);
 
     reset();
+    setIsCurrent(false);
     setIsAdding(false);
   });
 
@@ -103,7 +103,7 @@ export function EntryForm({ type, entries, onChange }) {
 
   // Replace handleImproveDescription with this
   const handleImproveDescription = async () => {
-    const description = watch("description");
+    const description = getValues("description");
     if (!description) {
       toast.error("Please enter a description first");
       return;
@@ -195,7 +195,7 @@ export function EntryForm({ type, entries, onChange }) {
                 <Input
                   type="month"
                   {...register("endDate")}
-                  disabled={current}
+                  disabled={isCurrent}
                   error={errors.endDate}
                 />
                 {errors.endDate && (
@@ -212,6 +212,7 @@ export function EntryForm({ type, entries, onChange }) {
                 id="current"
                 {...register("current")}
                 onChange={(e) => {
+                  setIsCurrent(e.target.checked);
                   setValue("current", e.target.checked);
                   if (e.target.checked) {
                     setValue("endDate", "");
@@ -239,7 +240,7 @@ export function EntryForm({ type, entries, onChange }) {
               variant="ghost"
               size="sm"
               onClick={handleImproveDescription}
-              disabled={isImproving || !watch("description")}
+              disabled={isImproving || !getValues("description")}
             >
               {isImproving ? (
                 <>
@@ -260,6 +261,7 @@ export function EntryForm({ type, entries, onChange }) {
               variant="outline"
               onClick={() => {
                 reset();
+                setIsCurrent(false);
                 setIsAdding(false);
               }}
             >

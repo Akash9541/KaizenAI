@@ -3,8 +3,15 @@ import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CoverLetterList from "./_components/cover-letter-list";
+import { requireOnboardedPageUser } from "@/lib/onboarding";
 
 export default async function CoverLetterPage() {
+  await requireOnboardedPageUser({
+    select: {
+      id: true,
+    },
+  });
+
   const coverLetters = await getCoverLetters();
 
   return (

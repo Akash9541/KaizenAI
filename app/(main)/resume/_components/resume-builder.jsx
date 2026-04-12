@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import Link from "next/link";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -9,27 +10,41 @@ import {
   Edit,
   Loader2,
   Monitor,
+  Sparkles,
   Save,
+  UserRound,
+  ArrowRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import MDEditor from "@uiw/react-md-editor";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { saveResume } from "@/actions/resume";
 import { EntryForm } from "./entry-form";
 import useFetch from "@/hooks/use-fetch";
-import { useUser } from "@clerk/nextjs";
 import { entriesToMarkdown } from "@/app/lib/helper";
 import { resumeSchema } from "@/app/lib/schema";
-import html2pdf from "html2pdf.js/dist/html2pdf.min.js";
 
-export default function ResumeBuilder({ initialContent }) {
+export default function ResumeBuilder({
+  initialContent,
+  initialUserName,
+  profileSummary,
+}) {
   const [activeTab, setActiveTab] = useState("edit");
   const [previewContent, setPreviewContent] = useState(initialContent);
-  const { user } = useUser();
   const [resumeMode, setResumeMode] = useState("preview");
+  const displayName = initialUserName?.trim() || "Your Name";
+  const hasSavedResume = Boolean(initialContent?.trim());
 
   const {
     control,
@@ -57,6 +72,35 @@ export default function ResumeBuilder({ initialContent }) {
   } = useFetch(saveResume);
 
   const formValues = watch();
+  const combinedContent = useMemo(() => {
+    const { summary, skills, experience, education, projects, contactInfo } =
+      formValues;
+    const parts = [];
+
+    if (contactInfo?.email) parts.push(`📧 ${contactInfo.email}`);
+    if (contactInfo?.mobile) parts.push(`📱 ${contactInfo.mobile}`);
+    if (contactInfo?.linkedin)
+      parts.push(`💼 [LinkedIn](${contactInfo.linkedin})`);
+    if (contactInfo?.twitter)
+      parts.push(`🐦 [Twitter](${contactInfo.twitter})`);
+
+    const contactMarkdown = parts.length
+      ? `## <div align="center">${displayName}</div>\n\n<div align="center">\n\n${parts.join(
+          " | "
+        )}\n\n</div>`
+      : "";
+
+    return [
+      contactMarkdown,
+      summary && `## Professional Summary\n\n${summary}`,
+      skills && `## Skills\n\n${skills}`,
+      entriesToMarkdown(experience, "Work Experience"),
+      entriesToMarkdown(education, "Education"),
+      entriesToMarkdown(projects, "Projects"),
+    ]
+      .filter(Boolean)
+      .join("\n\n");
+  }, [displayName, formValues]);
   const sanitizedPreviewContent = (previewContent ?? "").replace(
     /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
     ""
@@ -69,10 +113,9 @@ export default function ResumeBuilder({ initialContent }) {
   // Update preview content when form values change
   useEffect(() => {
     if (activeTab === "edit") {
-      const newContent = getCombinedContent();
-      setPreviewContent(newContent ? newContent : initialContent);
+      setPreviewContent(combinedContent || initialContent);
     }
-  }, [formValues, activeTab]);
+  }, [activeTab, combinedContent, initialContent]);
 
   // Handle save result
   useEffect(() => {
@@ -84,40 +127,18 @@ export default function ResumeBuilder({ initialContent }) {
     }
   }, [saveResult, saveError, isSaving]);
 
-  const getContactMarkdown = () => {
-    const { contactInfo } = formValues;
-    const parts = [];
-    if (contactInfo.email) parts.push(`📧 ${contactInfo.email}`);
-    if (contactInfo.mobile) parts.push(`📱 ${contactInfo.mobile}`);
-    if (contactInfo.linkedin)
-      parts.push(`💼 [LinkedIn](${contactInfo.linkedin})`);
-    if (contactInfo.twitter) parts.push(`🐦 [Twitter](${contactInfo.twitter})`);
-
-    return parts.length > 0
-      ? `## <div align="center">${user.fullName}</div>
-        \n\n<div align="center">\n\n${parts.join(" | ")}\n\n</div>`
-      : "";
-  };
-
-  const getCombinedContent = () => {
-    const { summary, skills, experience, education, projects } = formValues;
-    return [
-      getContactMarkdown(),
-      summary && `## Professional Summary\n\n${summary}`,
-      skills && `## Skills\n\n${skills}`,
-      entriesToMarkdown(experience, "Work Experience"),
-      entriesToMarkdown(education, "Education"),
-      entriesToMarkdown(projects, "Projects"),
-    ]
-      .filter(Boolean)
-      .join("\n\n");
-  };
-
   const [isGenerating, setIsGenerating] = useState(false);
 
   const generatePDF = async () => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
     setIsGenerating(true);
     try {
+      const { default: html2pdf } = await import(
+        "html2pdf.js/dist/html2pdf.min.js"
+      );
       const element = document.getElementById("resume-pdf");
       const opt = {
         margin: [15, 15],
@@ -142,8 +163,7 @@ export default function ResumeBuilder({ initialContent }) {
         .replace(/\n\s*\n/g, "\n\n")
         .trim();
 
-      console.log(previewContent, formattedContent);
-      await saveResumeFn(previewContent);
+      await saveResumeFn(formattedContent);
     } catch (error) {
       console.error("Save error:", error);
     }
@@ -187,6 +207,70 @@ export default function ResumeBuilder({ initialContent }) {
             )}
           </Button>
         </div>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-[1.5fr,0.9fr]">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <UserRound className="h-5 w-5" />
+              Resume Context
+            </CardTitle>
+            <CardDescription>
+              Keep your profile and industry context aligned with your resume.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex flex-wrap gap-2">
+              {profileSummary?.industry ? (
+                <Badge variant="secondary">{profileSummary.industry}</Badge>
+              ) : (
+                <Badge variant="outline">Industry not set</Badge>
+              )}
+              {typeof profileSummary?.experience === "number" && (
+                <Badge variant="secondary">
+                  {profileSummary.experience} years experience
+                </Badge>
+              )}
+              {profileSummary?.skills?.slice(0, 4).map((skill) => (
+                <Badge key={skill} variant="outline">
+                  {skill}
+                </Badge>
+              ))}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {hasSavedResume
+                ? "Your existing resume content is loaded in the Markdown tab and ready to refine."
+                : "Start from the form or jump into Markdown mode to build your resume draft."}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5" />
+              Quick Access
+            </CardTitle>
+            <CardDescription>
+              Update the profile and industry context that informs your resume.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-3">
+            <Link href="/onboarding?edit=true">
+              <Button variant="outline" className="w-full justify-between">
+                Edit Profile
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+            <Link href="/dashboard">
+              <Button variant="outline" className="w-full justify-between">
+                View Industry Insights
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>

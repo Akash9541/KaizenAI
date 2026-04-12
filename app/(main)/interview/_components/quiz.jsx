@@ -17,10 +17,29 @@ import QuizResult from "./quiz-result";
 import useFetch from "@/hooks/use-fetch";
 import { BarLoader } from "react-spinners";
 
+const difficultyOptions = [
+  {
+    value: "beginner",
+    label: "Beginner",
+    description: "Covers fundamentals and basic concepts.",
+  },
+  {
+    value: "intermediate",
+    label: "Intermediate",
+    description: "Focuses on practical problem-solving and common workflows.",
+  },
+  {
+    value: "advanced",
+    label: "Advanced",
+    description: "Uses deeper scenario-based and senior-level questions.",
+  },
+];
+
 export default function Quiz() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState([]);
   const [showExplanation, setShowExplanation] = useState(false);
+  const [difficulty, setDifficulty] = useState("intermediate");
 
   const {
     loading: generatingQuiz,
@@ -80,8 +99,8 @@ export default function Quiz() {
     setCurrentQuestion(0);
     setAnswers([]);
     setShowExplanation(false);
-    generateQuizFn();
     setResultData(null);
+    generateQuizFn(difficulty);
   };
 
   if (generatingQuiz) {
@@ -108,9 +127,32 @@ export default function Quiz() {
             This quiz contains 10 questions specific to your industry and
             skills. Take your time and choose the best answer for each question.
           </p>
+          <div className="space-y-3 pt-4">
+            <p className="text-sm font-medium">Choose your current level</p>
+            <RadioGroup
+              value={difficulty}
+              onValueChange={setDifficulty}
+              className="space-y-3"
+            >
+              {difficultyOptions.map((option) => (
+                <div
+                  key={option.value}
+                  className="flex items-start space-x-3 rounded-lg border p-3"
+                >
+                  <RadioGroupItem value={option.value} id={option.value} />
+                  <div className="space-y-1">
+                    <Label htmlFor={option.value}>{option.label}</Label>
+                    <p className="text-sm text-muted-foreground">
+                      {option.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </RadioGroup>
+          </div>
         </CardContent>
         <CardFooter>
-          <Button onClick={generateQuizFn} className="w-full">
+          <Button onClick={() => generateQuizFn(difficulty)} className="w-full">
             Start Quiz
           </Button>
         </CardFooter>
@@ -126,6 +168,9 @@ export default function Quiz() {
         <CardTitle>
           Question {currentQuestion + 1} of {quizData.length}
         </CardTitle>
+        <p className="text-sm text-muted-foreground capitalize">
+          Level: {difficulty}
+        </p>
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-lg font-medium">{question.question}</p>

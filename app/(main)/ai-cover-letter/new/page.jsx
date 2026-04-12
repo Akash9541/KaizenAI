@@ -2,8 +2,19 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CoverLetterGenerator from "../_components/cover-letter-generator";
+import { requireOnboardedPageUser } from "@/lib/onboarding";
 
-export default function NewCoverLetterPage() {
+export default async function NewCoverLetterPage() {
+  const user = await requireOnboardedPageUser({
+    select: {
+      name: true,
+      email: true,
+      industry: true,
+      experience: true,
+      skills: true,
+    },
+  });
+
   return (
     <div className="container mx-auto py-6">
       <div className="flex flex-col space-y-2">
@@ -24,7 +35,7 @@ export default function NewCoverLetterPage() {
         </div>
       </div>
 
-      <CoverLetterGenerator />
+      <CoverLetterGenerator profileSummary={user} />
     </div>
   );
 }

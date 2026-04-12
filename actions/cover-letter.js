@@ -1,18 +1,12 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { db } from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
 import { getGeminiModel } from "@/lib/gemini";
+import { requireOnboardedUser } from "@/lib/onboarding";
 
 export async function generateCoverLetter(data) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-
-  if (!user) throw new Error("User not found");
+  const user = await requireOnboardedUser();
 
   const prompt = `
     Write a professional cover letter for a ${data.jobTitle} position at ${
@@ -20,10 +14,10 @@ export async function generateCoverLetter(data) {
   }.
     
     About the candidate:
-    - Industry: ${user.industry}
-    - Years of Experience: ${user.experience}
-    - Skills: ${user.skills?.join(", ")}
-    - Professional Background: ${user.bio}
+    - Industry: ${user.industry || "Not provided"}
+    - Years of Experience: ${user.experience ?? "Not provided"}
+    - Skills: ${user.skills?.length ? user.skills.join(", ") : "Not provided"}
+    - Professional Background: ${user.bio || "Not provided"}
     
     Job Description:
     ${data.jobDescription}
@@ -63,14 +57,7 @@ export async function generateCoverLetter(data) {
 }
 
 export async function getCoverLetters() {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-
-  if (!user) throw new Error("User not found");
+  const user = await requireOnboardedUser();
 
   return await db.coverLetter.findMany({
     where: {
@@ -83,16 +70,9 @@ export async function getCoverLetters() {
 }
 
 export async function getCoverLetter(id) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
+  const user = await requireOnboardedUser();
 
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-
-  if (!user) throw new Error("User not found");
-
-  return await db.coverLetter.findUnique({
+  return await db.coverLetter.findFirst({
     where: {
       id,
       userId: user.id,
@@ -101,19 +81,61 @@ export async function getCoverLetter(id) {
 }
 
 export async function deleteCoverLetter(id) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-
-  if (!user) throw new Error("User not found");
-
-  return await db.coverLetter.delete({
+  const user = await requireOnboardedUser();
+  const existingCoverLetter = await db.coverLetter.findFirst({
     where: {
       id,
       userId: user.id,
     },
+    select: {
+      id: true,
+    },
   });
+
+  if (!existingCoverLetter) {
+    throw new Error("Cover letter not found");
+  }
+
+  return await db.coverLetter.delete({
+    where: {
+      id: existingCoverLetter.id,
+    },
+  });
+}
+
+export async function updateCoverLetter(id, content) {
+  const user = await requireOnboardedUser();
+  const sanitizedContent = typeof content === "string" ? content.trim() : "";
+
+  if (!sanitizedContent) {
+    throw new Error("Cover letter content is required");
+  }
+
+  const existingCoverLetter = await db.coverLetter.findFirst({
+    where: {
+      id,
+      userId: user.id,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!existingCoverLetter) {
+    throw new Error("Cover letter not found");
+  }
+
+  const updatedCoverLetter = await db.coverLetter.update({
+    where: {
+      id: existingCoverLetter.id,
+    },
+    data: {
+      content: sanitizedContent,
+    },
+  });
+
+  revalidatePath("/ai-cover-letter");
+  revalidatePath(`/ai-cover-letter/${id}`);
+
+  return updatedCoverLetter;
 }

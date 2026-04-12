@@ -1,21 +1,12 @@
 "use server";
 
-import { db } from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { ensureIndustryInsights } from "@/lib/industry-insights";
-import { syncUser } from "@/lib/checkUser";
+import { requireCurrentUser } from "@/lib/auth";
+import { db } from "@/lib/prisma";
 
 export async function updateUser(data) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
-  const user =
-    (await db.user.findUnique({
-      where: { clerkUserId: userId },
-    })) || (await syncUser());
-
-  if (!user) throw new Error("User not found");
+  const user = await requireCurrentUser();
 
   try {
     await ensureIndustryInsights(data.industry);
@@ -41,13 +32,11 @@ export async function updateUser(data) {
 }
 
 export async function getUserOnboardingStatus() {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
-  const existingUser =
-    (await db.user.findUnique({
-      where: { clerkUserId: userId },
-    })) || (await syncUser());
+  const existingUser = await requireCurrentUser({
+    select: {
+      industry: true,
+    },
+  });
 
   try {
     return {

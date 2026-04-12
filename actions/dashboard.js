@@ -1,26 +1,16 @@
 "use server";
 
-import { db } from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
 import { ensureIndustryInsights } from "@/lib/industry-insights";
+import { requireCurrentUser } from "@/lib/auth";
 
 export async function getIndustryInsights() {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
+  const user = await requireCurrentUser({
     include: {
       industryInsight: true,
     },
   });
 
-  if (!user) throw new Error("User not found");
+  if (!user.industry) throw new Error("User not onboarded");
 
-  // If no insights exist, generate them
-  if (!user.industryInsight) {
-    return ensureIndustryInsights(user.industry);
-  }
-
-  return user.industryInsight;
+  return ensureIndustryInsights(user.industry);
 }
