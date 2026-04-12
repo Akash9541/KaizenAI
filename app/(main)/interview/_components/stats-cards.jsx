@@ -6,8 +6,9 @@ export default function StatsCards({ assessments }) {
     if (!assessments?.length) return 0;
     const total = assessments.reduce(
       (sum, assessment) =>
-        sum + (typeof assessment.quizScore === "number" ? assessment.quizScore : 0),
-      0
+        sum +
+        (typeof assessment.quizScore === "number" ? assessment.quizScore : 0),
+      0,
     );
     return (total / assessments.length).toFixed(1);
   };
@@ -21,8 +22,9 @@ export default function StatsCards({ assessments }) {
     if (!assessments?.length) return 0;
     return assessments.reduce(
       (sum, assessment) =>
-        sum + (Array.isArray(assessment.questions) ? assessment.questions.length : 0),
-      0
+        sum +
+        (Array.isArray(assessment.questions) ? assessment.questions.length : 0),
+      0,
     );
   };
 

@@ -86,7 +86,7 @@ export default function ResumeBuilder({
 
     const contactMarkdown = parts.length
       ? `## <div align="center">${displayName}</div>\n\n<div align="center">\n\n${parts.join(
-          " | "
+          " | ",
         )}\n\n</div>`
       : "";
 
@@ -103,7 +103,7 @@ export default function ResumeBuilder({
   }, [displayName, formValues]);
   const sanitizedPreviewContent = (previewContent ?? "").replace(
     /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
-    ""
+    "",
   );
 
   useEffect(() => {
@@ -136,9 +136,8 @@ export default function ResumeBuilder({
 
     setIsGenerating(true);
     try {
-      const { default: html2pdf } = await import(
-        "html2pdf.js/dist/html2pdf.min.js"
-      );
+      const { default: html2pdf } =
+        await import("html2pdf.js/dist/html2pdf.min.js");
       const element = document.getElementById("resume-pdf");
       const opt = {
         margin: [15, 15],

@@ -26,7 +26,7 @@ export async function POST(request) {
           headers: {
             "Retry-After": String(rateLimit.retryAfterSeconds),
           },
-        }
+        },
       );
     }
 
@@ -80,7 +80,7 @@ export async function POST(request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: error.issues[0]?.message || "Invalid request data" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -88,13 +88,13 @@ export async function POST(request) {
     if (error?.message?.includes("Can't reach database server")) {
       return NextResponse.json(
         { error: "Database is temporarily unavailable. Please try again." },
-        { status: 503 }
+        { status: 503 },
       );
     }
 
     return NextResponse.json(
       { error: "Failed to process forgot password request" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

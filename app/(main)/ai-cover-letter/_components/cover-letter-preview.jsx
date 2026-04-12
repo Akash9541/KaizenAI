@@ -11,7 +11,7 @@ import { updateCoverLetter } from "@/actions/cover-letter";
 const removeScripts = (value) =>
   (value ?? "").replace(
     /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
-    ""
+    "",
   );
 
 const CoverLetterPreview = ({ id, content, companyName, jobTitle }) => {
@@ -27,7 +27,7 @@ const CoverLetterPreview = ({ id, content, companyName, jobTitle }) => {
 
   const sanitizedContent = useMemo(
     () => removeScripts(draftContent),
-    [draftContent]
+    [draftContent],
   );
 
   const hasChanges = sanitizedContent !== removeScripts(content);
@@ -52,9 +52,8 @@ const CoverLetterPreview = ({ id, content, companyName, jobTitle }) => {
 
     setIsDownloading(true);
     try {
-      const { default: html2pdf } = await import(
-        "html2pdf.js/dist/html2pdf.min.js"
-      );
+      const { default: html2pdf } =
+        await import("html2pdf.js/dist/html2pdf.min.js");
 
       if (!pdfRef.current) {
         throw new Error("PDF content is not ready yet");

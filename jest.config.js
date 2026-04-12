@@ -16,11 +16,11 @@ const customJestConfig = {
   testEnvironment: "jest-environment-node",
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/$1",
+    // Mock jose library
+    "^jose$": "<rootDir>/__mocks__/jose.js",
   },
-  testMatch: [
-    "**/__tests__/**/*.test.js",
-    "**/?(*.)+(spec|test).js",
-  ],
+  testMatch: ["**/__tests__/**/*.test.js", "**/?(*.)+(spec|test).js"],
+  transformIgnorePatterns: ["node_modules/(?!(jose|uuid)/)"],
   collectCoverageFrom: [
     "app/**/*.{js,jsx}",
     "lib/**/*.{js,jsx}",

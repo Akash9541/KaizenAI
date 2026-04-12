@@ -16,8 +16,14 @@ const signUpSchema = z.object({
   email: z.string().email("Valid email is required"),
   password: z
     .string()
-    .min(PASSWORD_MIN_LENGTH, `Password must be at least ${PASSWORD_MIN_LENGTH} characters`)
-    .max(PASSWORD_MAX_LENGTH, `Password must be less than ${PASSWORD_MAX_LENGTH} characters`),
+    .min(
+      PASSWORD_MIN_LENGTH,
+      `Password must be at least ${PASSWORD_MIN_LENGTH} characters`,
+    )
+    .max(
+      PASSWORD_MAX_LENGTH,
+      `Password must be less than ${PASSWORD_MAX_LENGTH} characters`,
+    ),
 });
 
 export async function POST(request) {
@@ -43,7 +49,7 @@ export async function POST(request) {
             "X-RateLimit-Remaining": String(Math.max(0, rateLimit.remaining)),
             "X-RateLimit-Reset": rateLimit.reset.toISOString(),
           },
-        }
+        },
       );
     }
 
@@ -54,7 +60,7 @@ export async function POST(request) {
     if (existingUser?.emailVerified) {
       return NextResponse.json(
         { error: "An account with this email already exists" },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
@@ -123,7 +129,7 @@ export async function POST(request) {
       console.error("Verification code email failed:", error);
       return NextResponse.json(
         { error: "Failed to send verification code" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -136,7 +142,7 @@ export async function POST(request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: error.issues[0]?.message || "Invalid sign up data" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -144,13 +150,13 @@ export async function POST(request) {
     if (error?.message?.includes("Can't reach database server")) {
       return NextResponse.json(
         { error: "Database is temporarily unavailable. Please try again." },
-        { status: 503 }
+        { status: 503 },
       );
     }
 
     return NextResponse.json(
       { error: "Failed to create account" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

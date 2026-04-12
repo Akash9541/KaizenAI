@@ -318,7 +318,8 @@ const FALLBACK_QUESTION_TEMPLATES = {
         "Allow unlimited verification attempts",
         "Use static OTP values",
       ],
-      correctAnswer: "Hash OTPs, enforce short TTL, invalidate after successful use",
+      correctAnswer:
+        "Hash OTPs, enforce short TTL, invalidate after successful use",
       explanation:
         "Short-lived one-time secrets and invalidation prevent reuse and replay abuse.",
     },
@@ -336,8 +337,7 @@ const FALLBACK_QUESTION_TEMPLATES = {
         "A combined signal set accelerates root-cause analysis during incidents.",
     },
     {
-      question:
-        "What is the safest JWT signing secret rotation strategy?",
+      question: "What is the safest JWT signing secret rotation strategy?",
       options: [
         "Use key IDs with overlapping validation windows",
         "Instantly invalidate all old tokens without transition",
@@ -394,7 +394,7 @@ const FALLBACK_QUESTION_TEMPLATES = {
 const renderTemplate = (text, replacements) =>
   Object.entries(replacements).reduce(
     (acc, [key, value]) => acc.replaceAll(`{{${key}}}`, value),
-    text
+    text,
   );
 
 const buildFallbackQuiz = ({ difficulty, industry, skills }) => {
@@ -422,13 +422,16 @@ const normalizeQuestion = (question, index, fallbackQuestions) => {
     .map((option) => option.trim())
     .filter(Boolean);
 
-  const prompt = typeof question?.question === "string" ? question.question.trim() : "";
+  const prompt =
+    typeof question?.question === "string" ? question.question.trim() : "";
   const correctAnswer =
     typeof question?.correctAnswer === "string"
       ? question.correctAnswer.trim()
       : "";
   const explanation =
-    typeof question?.explanation === "string" ? question.explanation.trim() : "";
+    typeof question?.explanation === "string"
+      ? question.explanation.trim()
+      : "";
 
   if (
     !prompt ||
@@ -471,8 +474,8 @@ export async function generateQuiz(level = "intermediate") {
     Generate 10 technical interview questions for a ${
       user.industry
     } professional${
-    user.skills?.length ? ` with expertise in ${user.skills.join(", ")}` : ""
-  } at the ${difficulty} level.
+      user.skills?.length ? ` with expertise in ${user.skills.join(", ")}` : ""
+    } at the ${difficulty} level.
 
     Difficulty guidance:
     ${QUIZ_LEVELS[difficulty]}
@@ -510,7 +513,7 @@ export async function generateQuiz(level = "intermediate") {
     }
 
     return Array.from({ length: 10 }, (_, index) =>
-      normalizeQuestion(rawQuestions[index], index, fallbackQuestions)
+      normalizeQuestion(rawQuestions[index], index, fallbackQuestions),
     );
   } catch (error) {
     console.error("Error generating quiz, using fallback questions:", error);
@@ -541,7 +544,7 @@ export async function saveQuizResult(questions, answers, score) {
     const wrongQuestionsText = wrongAnswers
       .map(
         (q) =>
-          `Question: "${q.question}"\nCorrect Answer: "${q.answer}"\nUser Answer: "${q.userAnswer}"`
+          `Question: "${q.question}"\nCorrect Answer: "${q.answer}"\nUser Answer: "${q.userAnswer}"`,
       )
       .join("\n\n");
 

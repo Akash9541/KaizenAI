@@ -40,7 +40,9 @@ const DashboardView = ({ insights }) => {
     maximumFractionDigits: 0,
   });
   const safeInsights = {
-    salaryRanges: Array.isArray(insights?.salaryRanges) ? insights.salaryRanges : [],
+    salaryRanges: Array.isArray(insights?.salaryRanges)
+      ? insights.salaryRanges
+      : [],
     growthRate: Number.isFinite(Number(insights?.growthRate))
       ? Number(insights.growthRate)
       : 0,
@@ -58,11 +60,13 @@ const DashboardView = ({ insights }) => {
       ? insights.recommendedSkills
       : [],
     lastUpdated:
-      insights?.lastUpdated && !Number.isNaN(new Date(insights.lastUpdated).getTime())
+      insights?.lastUpdated &&
+      !Number.isNaN(new Date(insights.lastUpdated).getTime())
         ? new Date(insights.lastUpdated)
         : new Date(),
     nextUpdate:
-      insights?.nextUpdate && !Number.isNaN(new Date(insights.nextUpdate).getTime())
+      insights?.nextUpdate &&
+      !Number.isNaN(new Date(insights.nextUpdate).getTime())
         ? new Date(insights.nextUpdate)
         : new Date(),
   };
@@ -144,7 +148,9 @@ const DashboardView = ({ insights }) => {
             <SafeOutlookIcon className={`h-4 w-4 ${outlookColor}`} />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{safeInsights.marketOutlook}</div>
+            <div className="text-2xl font-bold">
+              {safeInsights.marketOutlook}
+            </div>
             <p className="text-xs text-muted-foreground">
               Quarterly refresh {nextUpdateDistance}
             </p>
@@ -175,7 +181,7 @@ const DashboardView = ({ insights }) => {
             <div className="text-2xl font-bold">{safeInsights.demandLevel}</div>
             <div
               className={`h-2 w-full rounded-full mt-2 ${getDemandLevelColor(
-                safeInsights.demandLevel
+                safeInsights.demandLevel,
               )}`}
             />
           </CardContent>
@@ -233,8 +239,8 @@ const DashboardView = ({ insights }) => {
                             {inrFormatter.format(salaryRange.minInr)}
                           </p>
                           <p className="text-sm">
-                            Median: {usdFormatter.format(salaryRange.medianUsd)} /{" "}
-                            {inrFormatter.format(salaryRange.medianInr)}
+                            Median: {usdFormatter.format(salaryRange.medianUsd)}{" "}
+                            / {inrFormatter.format(salaryRange.medianInr)}
                           </p>
                           <p className="text-sm">
                             Max: {usdFormatter.format(salaryRange.maxUsd)} /{" "}
@@ -246,13 +252,21 @@ const DashboardView = ({ insights }) => {
                     return null;
                   }}
                 />
-                <Bar dataKey="minUsdChart" fill="#94a3b8" name="Min Salary (K USD)" />
+                <Bar
+                  dataKey="minUsdChart"
+                  fill="#94a3b8"
+                  name="Min Salary (K USD)"
+                />
                 <Bar
                   dataKey="medianUsdChart"
                   fill="#64748b"
                   name="Median Salary (K USD)"
                 />
-                <Bar dataKey="maxUsdChart" fill="#475569" name="Max Salary (K USD)" />
+                <Bar
+                  dataKey="maxUsdChart"
+                  fill="#475569"
+                  name="Max Salary (K USD)"
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -260,7 +274,9 @@ const DashboardView = ({ insights }) => {
             {salaryData.map((range) => (
               <div key={range.name} className="rounded-lg border p-4">
                 <p className="font-medium">{range.name}</p>
-                <p className="text-sm text-muted-foreground">{range.location}</p>
+                <p className="text-sm text-muted-foreground">
+                  {range.location}
+                </p>
                 <p className="mt-2 text-sm">
                   USD: {usdFormatter.format(range.minUsd)} -{" "}
                   {usdFormatter.format(range.maxUsd)}

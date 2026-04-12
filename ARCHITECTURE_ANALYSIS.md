@@ -13,6 +13,7 @@
 The AI Career Coach is a modern, full-stack web application implementing a layered architecture pattern with clear separation between frontend, backend, and data layers. It combines Next.js's hybrid rendering capabilities with a RESTful API approach, robust authentication, and AI-powered features for career development coaching.
 
 **Key Architectural Characteristics:**
+
 - 🏗️ **Modular Design**: Clear folder structure separating concerns
 - 🔐 **Enterprise Security**: JWT tokens in HttpOnly cookies, distributed rate limiting, password hashing
 - ⚡ **Performance Optimized**: Turbopack build system, Redis caching, optimized database queries
@@ -99,6 +100,7 @@ app/
 ```
 
 **Organizational Rationale**:
+
 - **Route Groups** `(auth)` and `(main)` provide logical separation without affecting URL structure
 - **Colocation Pattern** with `_components/` folders keeps component-specific logic together
 - **API Routes** grouped by domain (auth, jobs) for clarity
@@ -131,6 +133,7 @@ components/
 ```
 
 **Pattern**: Shadcn/UI Architecture
+
 - Low-level UI primitives in `ui/` folder
 - Built on Radix UI for accessibility
 - Styled with Tailwind CSS
@@ -162,6 +165,7 @@ lib/
 ```
 
 **Separation of Concerns**:
+
 - **Auth Module**: Cryptography, token management, password hashing
 - **AI Module**: LLM integrations, resilience patterns
 - **Service Integrations**: Email, background jobs, external APIs
@@ -179,6 +183,7 @@ actions/
 ```
 
 **Pattern**: Server Actions for Client-Server Communication
+
 - Direct database operations from client components
 - Type-safe mutation handling
 - Reduced bundle size vs. traditional API routes for some operations
@@ -202,15 +207,15 @@ prisma/
 
 ### 2.1 Core Configuration Files
 
-| File | Purpose | Pattern |
-|------|---------|---------|
-| `package.json` | Dependencies, scripts, project metadata | npm workspace |
-| `next.config.mjs` | Next.js configuration (Turbopack, images) | ESM module |
-| `tsconfig.json` / `jsconfig.json` | TypeScript/JavaScript config & path aliases | `@/` for root imports |
-| `tailwind.config.mjs` | Tailwind CSS theming & plugins | CSS framework config |
-| `postcss.config.mjs` | PostCSS plugins (Tailwind) | CSS preprocessing |
-| `.eslintrc.json` | Code quality rules | ESLint 9.x flat config |
-| `components.json` | Shadcn/UI component configuration | Component generator |
+| File                              | Purpose                                     | Pattern                |
+| --------------------------------- | ------------------------------------------- | ---------------------- |
+| `package.json`                    | Dependencies, scripts, project metadata     | npm workspace          |
+| `next.config.mjs`                 | Next.js configuration (Turbopack, images)   | ESM module             |
+| `tsconfig.json` / `jsconfig.json` | TypeScript/JavaScript config & path aliases | `@/` for root imports  |
+| `tailwind.config.mjs`             | Tailwind CSS theming & plugins              | CSS framework config   |
+| `postcss.config.mjs`              | PostCSS plugins (Tailwind)                  | CSS preprocessing      |
+| `.eslintrc.json`                  | Code quality rules                          | ESLint 9.x flat config |
+| `components.json`                 | Shadcn/UI component configuration           | Component generator    |
 
 ### 2.2 Authentication Flow Relationships
 
@@ -283,6 +288,7 @@ Execute job (email, processing, etc.)
 ### 3.1 Next.js App Router Adoption
 
 **Rationale:**
+
 1. **Modern Performance**: Server Components + Turbopack bundler
 2. **Improved DX**: Easier colocated components and better error handling
 3. **Type Safety**: Built-in TypeScript support
@@ -290,24 +296,28 @@ Execute job (email, processing, etc.)
 5. **Streaming**: Support for streaming UI updates to clients
 
 **Alternatives Rejected:**
+
 - Pages Router (legacy, slower)
 - Full SPA stack (worse SEO, larger bundles)
 
 ### 3.2 Route Groups `(auth)` and `(main)`
 
 **Rationale:**
+
 1. **URL Independence**: Grouping doesn't affect routing
 2. **Logical Organization**: Auth pages separate from main app
 3. **Shared Layouts**: Each group has its own layout wrapper
 4. **Layout Boundaries**: Middleware can target specific groups
 
 **Example**:
+
 - `(auth)/sign-in` → URL is `/sign-in` (not `/auth/sign-in`)
 - `(main)/dashboard` → URL is `/dashboard` (not `/main/dashboard`)
 
 ### 3.3 Colocation Pattern with `_components/`
 
 **Rationale:**
+
 1. **Discoverability**: Components live near their usage
 2. **Tree Shaking**: Unused components excluded from routes
 3. **Privacy**: `_` prefix prevents route matching
@@ -316,6 +326,7 @@ Execute job (email, processing, etc.)
 ### 3.4 Server Actions in `actions/`
 
 **Rationale:**
+
 1. **Type Safety**: No manual route creation for mutations
 2. **Smaller Bundle**: Business logic runs server-side
 3. **Reduced API Surface**: Fewer manual endpoints
@@ -324,6 +335,7 @@ Execute job (email, processing, etc.)
 ### 3.5 Distributed Rate Limiting (Redis)
 
 **Rationale:**
+
 1. **Scalability**: Works across multiple instances
 2. **Accuracy**: Single source of truth
 3. **Performance**: Millisecond lookups
@@ -332,6 +344,7 @@ Execute job (email, processing, etc.)
 ### 3.6 Prisma ORM + PostgreSQL
 
 **Rationale:**
+
 1. **Type Generation**: Prisma generates TypeScript types
 2. **Schema as Code**: Migrations tracked in version control
 3. **Query Optimization**: Built-in query optimization
@@ -352,6 +365,7 @@ Execute job (email, processing, etc.)
 ```
 
 **Benefits:**
+
 - **Testability**: Each layer can be tested independently
 - **Maintainability**: Changes localized to layers
 - **Scalability**: Layers can be deployed separately
@@ -367,16 +381,17 @@ Execute job (email, processing, etc.)
 ```javascript
 // lib/auth.js
 const cookie = encodeSetCookie({
-  name: 'career_coach_auth',
+  name: "career_coach_auth",
   value: jwtToken,
-  httpOnly: true,        // ✅ XSS protected
-  secure: true,          // ✅ HTTPS only
-  sameSite: 'strict',    // ✅ CSRF protected
-  maxAge: 7*24*60*60,    // 7 days
-})
+  httpOnly: true, // ✅ XSS protected
+  secure: true, // ✅ HTTPS only
+  sameSite: "strict", // ✅ CSRF protected
+  maxAge: 7 * 24 * 60 * 60, // 7 days
+});
 ```
 
 **Why**:
+
 - Tokens not exposed in JSON (no XSS risk)
 - HttpOnly flag prevents JavaScript access
 - SameSite strict prevents CSRF attacks
@@ -388,16 +403,17 @@ const cookie = encodeSetCookie({
 ```javascript
 // Rate limiting by endpoint type
 RATE_LIMITS = {
-  SIGN_UP: { limit: 5, window: 10*60*1000 },
-  SIGN_IN: { limit: 8, window: 10*60*1000 },
-  VERIFY_CODE: { limit: 10, window: 10*60*1000 },
-}
+  SIGN_UP: { limit: 5, window: 10 * 60 * 1000 },
+  SIGN_IN: { limit: 8, window: 10 * 60 * 1000 },
+  VERIFY_CODE: { limit: 10, window: 10 * 60 * 1000 },
+};
 
 // Distributed via Redis (production)
 // Falls back to in-memory (development)
 ```
 
 **Why**:
+
 - Prevents brute force attacks
 - Protects against spam
 - Uses Redis for scalability
@@ -417,6 +433,7 @@ Step 4: emailVerified = true → user can now log in
 ```
 
 **Why**:
+
 - Credentials never persisted for unverified accounts
 - Prevents account takeover via compromised emails
 - OTP centralized in constants for consistency
@@ -442,12 +459,13 @@ export async function createCoverLetter(formData) {
 
 ```javascript
 // app/(main)/ai-cover-letter/new/page.jsx
-'use client'
+"use client";
 
-const { coverLetter, error } = await createCoverLetter(data)
+const { coverLetter, error } = await createCoverLetter(data);
 ```
 
 **Why**:
+
 - No manual HTTP routing
 - End-to-end type safety
 - Automatic serialization
@@ -459,18 +477,19 @@ const { coverLetter, error } = await createCoverLetter(data)
 ```
 components/ui/button.jsx
     ↑ (extends Radix UI)
-    
+
 components/ui/card.jsx
     ↑ (uses button, extends Radix UI)
-    
+
 app/(main)/dashboard/_component/stats-card.jsx
     ↑ (uses UI components)
-    
+
 app/(main)/dashboard/page.jsx
     (assembles feature)
 ```
 
 **Why**:
+
 - Composable design system
 - Consistent across app
 - Easy theming with Tailwind
@@ -487,6 +506,7 @@ try-catch in actions/  ← Server Action errors
 ```
 
 **Why**:
+
 - Consistent error UI
 - Prevents white-screen crashes
 - User-friendly error messages
@@ -512,6 +532,7 @@ try-catch in actions/  ← Server Action errors
 ```
 
 **Why**:
+
 - Broad coverage at unit level (fast)
 - Integration tests catch middleware issues
 - E2E tests verify real workflows
@@ -519,16 +540,16 @@ try-catch in actions/  ← Server Action errors
 
 ### 4.8 Naming Conventions
 
-| Category | Convention | Example |
-|----------|-----------|---------|
-| Components | PascalCase | `AuthForm.jsx`, `DashboardCard.jsx` |
-| Pages | lowercase | `page.jsx`, `layout.js` |
-| Server Actions | camelCase | `createCoverLetter()` |
-| Utilities | camelCase | `hashPassword()`, `validateOTP()` |
-| Constants | UPPER_SNAKE_CASE | `JWT_AUTH_TTL_SECONDS` |
-| Private components | `_prefix` | `_components/` folder |
-| Private routes | `[...]` | `[[...sign-in]]/` |
-| Type definitions | PascalCase | `User`, `Assessment` |
+| Category           | Convention       | Example                             |
+| ------------------ | ---------------- | ----------------------------------- |
+| Components         | PascalCase       | `AuthForm.jsx`, `DashboardCard.jsx` |
+| Pages              | lowercase        | `page.jsx`, `layout.js`             |
+| Server Actions     | camelCase        | `createCoverLetter()`               |
+| Utilities          | camelCase        | `hashPassword()`, `validateOTP()`   |
+| Constants          | UPPER_SNAKE_CASE | `JWT_AUTH_TTL_SECONDS`              |
+| Private components | `_prefix`        | `_components/` folder               |
+| Private routes     | `[...]`          | `[[...sign-in]]/`                   |
+| Type definitions   | PascalCase       | `User`, `Assessment`                |
 
 ### 4.9 Import Path Aliases
 
@@ -546,15 +567,17 @@ try-catch in actions/  ← Server Action errors
 ```
 
 **Usage**:
+
 ```javascript
 // Instead of:
-import { db } from '../../../lib/prisma'
+import { db } from "../../../lib/prisma";
 
 // Write:
-import { db } from '@/lib/prisma'
+import { db } from "@/lib/prisma";
 ```
 
 **Why**:
+
 - More readable imports
 - Easier refactoring
 - Clear dependency direction
@@ -575,6 +598,7 @@ GEMINI_API_KEY
 ```
 
 **Why**:
+
 - Prevents accidental secret leaks
 - Clear security boundary
 - Next.js enforces this automatically
@@ -691,11 +715,11 @@ Vercel Platform (Hosting)
 
 ### 7.2 Environment Separation
 
-| Environment | Database | Redis | Configuration |
-|-------------|----------|-------|------------------|
-| Development | Local PostgreSQL | Local Redis | `.env.local` |
-| Staging | Cloud PostgreSQL | Upstash (staging) | `.env.staging` |
-| Production | Cloud PostgreSQL | Upstash (prod) | Vercel Secrets |
+| Environment | Database         | Redis             | Configuration  |
+| ----------- | ---------------- | ----------------- | -------------- |
+| Development | Local PostgreSQL | Local Redis       | `.env.local`   |
+| Staging     | Cloud PostgreSQL | Upstash (staging) | `.env.staging` |
+| Production  | Cloud PostgreSQL | Upstash (prod)    | Vercel Secrets |
 
 ---
 
@@ -750,17 +774,20 @@ Counter reset after time window
 ## 9. Performance Optimizations
 
 ### 9.1 Build-Time Optimizations
+
 - **Turbopack**: 10x faster than Webpack in this configuration
 - **Static Generation**: Pre-build static pages where possible
 - **Image Optimization**: Next.js Image component with lazy loading
 
 ### 9.2 Runtime Optimizations
+
 - **Server Components**: Reduce JavaScript sent to browser
 - **Server Actions**: No API serialization overhead
 - **Database Indexes**: Indexed queries on email, userId, emailVerified
 - **Connection Pooling**: PostgreSQL connection pooling via Neon/Supabase
 
 ### 9.3 Caching Strategy
+
 - **Redis**: Rate limit counters, session data
 - **HTTP Caching**: CDN caches static assets
 - **Browser Caching**: Service worker support (can be added)
@@ -770,12 +797,14 @@ Counter reset after time window
 ## 10. Extension Points & Future Improvements
 
 ### 10.1 Current Extension Points
+
 1. **AI Service Layer**: Switch Gemini to OpenAI/Claude via lib/gemini.js
 2. **Email Service**: Change Brevo to SendGrid/Mailgun via lib/brevo.js
 3. **Job Queue**: Scale Inngest to more complex workflows
 4. **UI Theme**: Extend Tailwind via tailwind.config.mjs
 
 ### 10.2 Recommended Future Additions
+
 1. **GraphQL**: Alternative to REST API for complex data queries
 2. **WebSockets**: Real-time notifications (mention in actions)
 3. **Message Queue**: For more complex async workflows beyond Inngest
@@ -789,32 +818,32 @@ Counter reset after time window
 ### 11.1 Testing Coverage
 
 **File**: `jest.config.js`
+
 - Coverage Threshold: 50% across branches, functions, lines, statements
 - Test Path: `__tests__/` organized by test type
 - Environment: jest-environment-node (API tests)
 
 **Test Types**:
+
 1. **Unit Tests** (`__tests__/unit/auth.test.js`):
    - Individual functions
    - No external dependencies
    - Mocked
-   
 2. **Integration Tests** (`__tests__/integration/auth-api.test.js`):
    - API endpoints
    - Database operations
    - Service integrations
-   
 3. **E2E Tests** (`__tests__/e2e/auth.spec.ts`):
    - Playwright browser automation
    - Full user workflows
    - Real browser environment
-   
 4. **Load Tests** (`__tests__/load/auth-load-test.js`):
    - k6 performance testing
    - Concurrent user simulation
    - Throughput and latency measurement
 
 ### 11.2 Linting & Formatting
+
 - **ESLint**: Code quality rules (9.x flat config)
 - **Prettier**: Automatic code formatting
 - **npm run lint**: Check for violations
@@ -824,20 +853,20 @@ Counter reset after time window
 
 ## Summary: Why This Architecture?
 
-| Aspect | Choice | Benefit |
-|--------|--------|---------|
-| Framework | Next.js App Router | Modern DX, SEO, type safety |
-| Language | JavaScript/JSX | Large ecosystem, flexible |
-| Database | PostgreSQL + Prisma | Type generation, migrations, reliability |
-| UI | Shadcn/UI + Tailwind | Customizable, accessible, fast theming |
-| Auth | JWT in HttpOnly cookies | Secure, XSS/CSRF protected |
-| Scaling | Redis rate limiting | Distributed, horizontal scalability |
-| Testing | 4-level pyramid | Quality assurance at all levels |
-| Deployment | Vercel | Optimized for Next.js, automatic deploys |
-| AI Integration | Google Gemini | Powerful, cost-effective, fallback support |
+| Aspect         | Choice                  | Benefit                                    |
+| -------------- | ----------------------- | ------------------------------------------ |
+| Framework      | Next.js App Router      | Modern DX, SEO, type safety                |
+| Language       | JavaScript/JSX          | Large ecosystem, flexible                  |
+| Database       | PostgreSQL + Prisma     | Type generation, migrations, reliability   |
+| UI             | Shadcn/UI + Tailwind    | Customizable, accessible, fast theming     |
+| Auth           | JWT in HttpOnly cookies | Secure, XSS/CSRF protected                 |
+| Scaling        | Redis rate limiting     | Distributed, horizontal scalability        |
+| Testing        | 4-level pyramid         | Quality assurance at all levels            |
+| Deployment     | Vercel                  | Optimized for Next.js, automatic deploys   |
+| AI Integration | Google Gemini           | Powerful, cost-effective, fallback support |
 
 This architecture is **production-ready**, **enterprise-secure**, and **designed for scale**.
 
 ---
 
-*Generated: April 12, 2026 | Version: 2.0 (Enterprise Security Release)*
+_Generated: April 12, 2026 | Version: 2.0 (Enterprise Security Release)_

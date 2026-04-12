@@ -12,14 +12,24 @@ import {
   getLockState,
   recordFailedLoginAttempt,
 } from "@/lib/login-guard";
-import { PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH, AUTH_COOKIE_NAME } from "@/lib/constants";
+import {
+  PASSWORD_MIN_LENGTH,
+  PASSWORD_MAX_LENGTH,
+  AUTH_COOKIE_NAME,
+} from "@/lib/constants";
 
 const signInSchema = z.object({
   email: z.string().email("Valid email is required"),
   password: z
     .string()
-    .min(PASSWORD_MIN_LENGTH, `Password must be at least ${PASSWORD_MIN_LENGTH} characters`)
-    .max(PASSWORD_MAX_LENGTH, `Password must be less than ${PASSWORD_MAX_LENGTH} characters`),
+    .min(
+      PASSWORD_MIN_LENGTH,
+      `Password must be at least ${PASSWORD_MIN_LENGTH} characters`,
+    )
+    .max(
+      PASSWORD_MAX_LENGTH,
+      `Password must be less than ${PASSWORD_MAX_LENGTH} characters`,
+    ),
 });
 
 export async function POST(request) {
@@ -45,7 +55,7 @@ export async function POST(request) {
             "X-RateLimit-Remaining": String(Math.max(0, rateLimit.remaining)),
             "X-RateLimit-Reset": rateLimit.reset.toISOString(),
           },
-        }
+        },
       );
     }
     // login-guard functions are now async (Redis-backed) — must await
@@ -59,7 +69,7 @@ export async function POST(request) {
           headers: {
             "Retry-After": String(lockState.retryAfterSeconds),
           },
-        }
+        },
       );
     }
 
@@ -71,7 +81,7 @@ export async function POST(request) {
       await recordFailedLoginAttempt(normalizedEmail); // async — must await
       return NextResponse.json(
         { error: "Invalid email or password" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -81,7 +91,7 @@ export async function POST(request) {
           error:
             "Password login is not set for this account yet. Use Forgot Password to set one.",
         },
-        { status: 428 }
+        { status: 428 },
       );
     }
 
@@ -91,16 +101,19 @@ export async function POST(request) {
           error:
             "Email is not verified. Complete sign-up verification or reset password.",
         },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
-    const isValidPassword = await comparePassword(data.password, user.passwordHash);
+    const isValidPassword = await comparePassword(
+      data.password,
+      user.passwordHash,
+    );
     if (!isValidPassword) {
       await recordFailedLoginAttempt(normalizedEmail); // async — must await
       return NextResponse.json(
         { error: "Invalid email or password" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -118,7 +131,7 @@ export async function POST(request) {
           emailVerified: user.emailVerified,
         },
       },
-      { status: 200 }
+      { status: 200 },
     );
     response.cookies.set(AUTH_COOKIE_NAME, token, getAuthCookieOptions());
     return response;
@@ -126,7 +139,7 @@ export async function POST(request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: error.issues[0]?.message || "Invalid sign in data" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -134,7 +147,7 @@ export async function POST(request) {
     if (error?.message?.includes("Can't reach database server")) {
       return NextResponse.json(
         { error: "Database is temporarily unavailable. Please try again." },
-        { status: 503 }
+        { status: 503 },
       );
     }
 

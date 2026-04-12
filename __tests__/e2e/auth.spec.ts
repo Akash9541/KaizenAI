@@ -151,9 +151,7 @@ test.describe("Rate Limiting", () => {
     }
 
     // Should eventually see rate limit message
-    const rateLimitMessage = page.locator(
-      "text=too many|Too many|rate limit"
-    );
+    const rateLimitMessage = page.locator("text=too many|Too many|rate limit");
     await expect(rateLimitMessage).toBeVisible({ timeout: 10000 });
   });
 });

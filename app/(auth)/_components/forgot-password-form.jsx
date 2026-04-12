@@ -41,7 +41,9 @@ export default function ForgotPasswordForm() {
 
     try {
       const response = await fetch(
-        awaitingReset ? "/api/auth/reset-password" : "/api/auth/forgot-password",
+        awaitingReset
+          ? "/api/auth/reset-password"
+          : "/api/auth/forgot-password",
         {
           method: "POST",
           credentials: "include",
@@ -58,9 +60,9 @@ export default function ForgotPasswordForm() {
                 }
               : {
                   email: formData.email,
-                }
+                },
           ),
-        }
+        },
       );
 
       const result = await response.json();

@@ -9,7 +9,13 @@ import {
 } from "@/lib/auth";
 import { checkRateLimit, rateLimiters } from "@/lib/rate-limit-redis";
 import { clearLoginAttempts } from "@/lib/login-guard";
-import { OTP_LENGTH, OTP_REGEX, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH, AUTH_COOKIE_NAME } from "@/lib/constants";
+import {
+  OTP_LENGTH,
+  OTP_REGEX,
+  PASSWORD_MIN_LENGTH,
+  PASSWORD_MAX_LENGTH,
+  AUTH_COOKIE_NAME,
+} from "@/lib/constants";
 
 const resetPasswordSchema = z
   .object({
@@ -20,8 +26,14 @@ const resetPasswordSchema = z
       .regex(OTP_REGEX, "Verification code must contain only digits"),
     password: z
       .string()
-      .min(PASSWORD_MIN_LENGTH, `Password must be at least ${PASSWORD_MIN_LENGTH} characters`)
-      .max(PASSWORD_MAX_LENGTH, `Password must be less than ${PASSWORD_MAX_LENGTH} characters`),
+      .min(
+        PASSWORD_MIN_LENGTH,
+        `Password must be at least ${PASSWORD_MIN_LENGTH} characters`,
+      )
+      .max(
+        PASSWORD_MAX_LENGTH,
+        `Password must be less than ${PASSWORD_MAX_LENGTH} characters`,
+      ),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -52,7 +64,7 @@ export async function POST(request) {
             "X-RateLimit-Remaining": String(Math.max(0, rateLimit.remaining)),
             "X-RateLimit-Reset": rateLimit.reset.toISOString(),
           },
-        }
+        },
       );
     }
     const token = hashOtpCode({
@@ -74,7 +86,7 @@ export async function POST(request) {
     ) {
       return NextResponse.json(
         { error: "Invalid or expired reset code" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -102,7 +114,7 @@ export async function POST(request) {
           emailVerified: updatedUser.emailVerified,
         },
       },
-      { status: 200 }
+      { status: 200 },
     );
     response.cookies.set(AUTH_COOKIE_NAME, authToken, getAuthCookieOptions());
 
@@ -111,7 +123,7 @@ export async function POST(request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: error.issues[0]?.message || "Invalid reset request" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -119,13 +131,13 @@ export async function POST(request) {
     if (error?.message?.includes("Can't reach database server")) {
       return NextResponse.json(
         { error: "Database is temporarily unavailable. Please try again." },
-        { status: 503 }
+        { status: 503 },
       );
     }
 
     return NextResponse.json(
       { error: "Failed to reset password" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

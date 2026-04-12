@@ -17,11 +17,10 @@ import { NextResponse } from "next/server";
 export async function GET(request) {
   console.warn(
     "[Security] Legacy /api/auth/verify-email was called — redirecting. " +
-      "This endpoint has been decommissioned. Use /api/auth/verify-code instead."
+      "This endpoint has been decommissioned. Use /api/auth/verify-code instead.",
   );
 
   return NextResponse.redirect(
-    new URL("/sign-in?error=legacy_link_expired", request.url)
+    new URL("/sign-in?error=legacy_link_expired", request.url),
   );
 }
-

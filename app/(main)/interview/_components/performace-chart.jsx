@@ -38,7 +38,7 @@ export default function PerformanceChart({ assessments }) {
                 : 0,
           }))
         : [],
-    [assessments]
+    [assessments],
   );
 
   return (

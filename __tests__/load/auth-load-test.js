@@ -1,7 +1,7 @@
 /**
  * K6 Load Testing Script for Authentication APIs
  * Tests performance under concurrent load
- * 
+ *
  * Run: k6 run __tests__/load/auth-load-test.js
  */
 
@@ -93,7 +93,7 @@ export function testResetPasswordLoad() {
   const response = http.post(
     `${BASE_URL}/api/auth/reset-password`,
     payload,
-    params
+    params,
   );
 
   check(response, {
@@ -109,13 +109,10 @@ export function testResetPasswordLoad() {
  * Test rate limiting effectiveness
  */
 export function testRateLimiting() {
-  const scenarios = [
-    testSignUpLoad,
-    testSignInLoad,
-    testResetPasswordLoad,
-  ];
+  const scenarios = [testSignUpLoad, testSignInLoad, testResetPasswordLoad];
 
-  const randomScenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+  const randomScenario =
+    scenarios[Math.floor(Math.random() * scenarios.length)];
   randomScenario();
 }
 

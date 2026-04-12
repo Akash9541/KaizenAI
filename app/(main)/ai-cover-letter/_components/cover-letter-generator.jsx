@@ -60,7 +60,9 @@ export default function CoverLetterGenerator({ profileSummary }) {
   };
 
   const hasProfileContext = Boolean(
-    profileSummary?.industry || profileSummary?.experience || profileSummary?.skills?.length
+    profileSummary?.industry ||
+    profileSummary?.experience ||
+    profileSummary?.skills?.length,
   );
 
   return (
@@ -133,7 +135,8 @@ export default function CoverLetterGenerator({ profileSummary }) {
         <CardHeader>
           <CardTitle>Job Details</CardTitle>
           <CardDescription>
-            Provide the role details and we&apos;ll draft a letter using your saved profile plus the job description.
+            Provide the role details and we&apos;ll draft a letter using your
+            saved profile plus the job description.
           </CardDescription>
         </CardHeader>
         <CardContent>

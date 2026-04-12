@@ -5,6 +5,7 @@ A secure, scalable AI-powered career coaching platform built with Next.js, Postg
 **Note**: This project has been upgraded with enterprise-grade security, performance optimizations, and comprehensive testing infrastructure.
 
 ## Quick Links
+
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [Project Setup](#project-setup)
@@ -19,6 +20,7 @@ A secure, scalable AI-powered career coaching platform built with Next.js, Postg
 ## Features
 
 ### User Features
+
 - **Personalized Industry Insights**: Real-time market trends and salary data
 - **AI-Powered Resume Building**: Suggestions and ATS optimization
 - **Cover Letter Generation**: Tailored to job descriptions
@@ -26,6 +28,7 @@ A secure, scalable AI-powered career coaching platform built with Next.js, Postg
 - **Progress Tracking**: Comprehensive assessment and improvement tracking
 
 ### Technical Improvements
+
 - 🔒 **Enterprise-Grade Security**: JWT-based auth, rate limiting, CSRF protection
 - 🚀 **Performance Optimized**: Next.js 16 with Turbopack, optimized database queries
 - 📊 **Scalable Architecture**: Redis-based distributed rate limiting, async job processing
@@ -36,6 +39,7 @@ A secure, scalable AI-powered career coaching platform built with Next.js, Postg
 ## Tech Stack
 
 ### Frontend
+
 - **Framework**: Next.js 16 with App Router
 - **UI Components**: Shadcn/UI + Radix UI
 - **Styling**: Tailwind CSS
@@ -43,6 +47,7 @@ A secure, scalable AI-powered career coaching platform built with Next.js, Postg
 - **State Management**: React Context + Server Actions
 
 ### Backend
+
 - **Runtime**: Node.js 20
 - **API**: Next.js API Routes
 - **Database**: PostgreSQL with Prisma ORM
@@ -52,6 +57,7 @@ A secure, scalable AI-powered career coaching platform built with Next.js, Postg
 - **AI**: Google Gemini API v2.0+
 
 ### Infrastructure & DevOps
+
 - **Deployment**: Vercel (recommended)
 - **Database Hosting**: Neon PostgreSQL
 - **Redis**: Upstash
@@ -61,17 +67,20 @@ A secure, scalable AI-powered career coaching platform built with Next.js, Postg
 ## Project Setup
 
 ### Prerequisites
+
 - Node.js 20+ and npm/pnpm
 - PostgreSQL 14+ (local or cloud)
 - Git
 
 ### 1. Clone Repository
+
 ```bash
 git clone https://github.com/yourusername/ai-career-coach.git
 cd ai-career-coach
 ```
 
 ### 2. Install Dependencies
+
 ```bash
 npm install
 # or
@@ -79,6 +88,7 @@ pnpm install
 ```
 
 ### 3. Configure Environment
+
 ```bash
 # Copy example environment file
 cp .env.example .env.local
@@ -89,6 +99,7 @@ nano .env.local
 ```
 
 ### 4. Setup Database
+
 ```bash
 # Generate Prisma Client
 npm run db:generate
@@ -98,6 +109,7 @@ npm run db:push
 ```
 
 ### 5. Run Development Server
+
 ```bash
 npm run dev
 ```
@@ -107,6 +119,7 @@ Visit `http://localhost:3000` - app is ready!
 ## Environment Configuration
 
 ### Critical Variables (Required)
+
 ```env
 # Database
 DATABASE_URL=postgresql://user:password@host:5432/db_name
@@ -133,6 +146,7 @@ See [.env.example](.env.example) for complete configuration reference.
 ## Authentication Flow
 
 ### 1. Sign Up
+
 ```
 User Input → Validation → Hash Password → Generate OTP → Send Email
      ↓ User Verifies OTP ↓
@@ -142,6 +156,7 @@ Create Account → Generate JWT → Set HttpOnly Cookie → Dashboard
 Rate Limit: 5 attempts per 10 minutes
 
 ### 2. Sign In
+
 ```
 User Credentials → Rate Check → Find User → Verify Password
      ↓
@@ -152,6 +167,7 @@ Rate Limit: 8 attempts per 10 minutes
 Account Lockout: 5 failures for 15 minutes
 
 ### 3. Password Reset
+
 ```
 Email → Generate OTP → Send Email → User Verifies OTP
      ↓
@@ -166,17 +182,18 @@ Rate Limit: 8 attempts per 10 minutes
 
 ### Authentication Endpoints
 
-| Endpoint | Method | Description | Auth Required |
-|----------|--------|-------------|-----------------|
-| `/api/auth/sign-up` | POST | Create account | ❌ |
-| `/api/auth/sign-in` | POST | Login | ❌ |
-| `/api/auth/verify-code` | POST | Verify OTP | ❌ |
-| `/api/auth/forgot-password` | POST | Request password reset | ❌ |
-| `/api/auth/reset-password` | POST | Complete password reset | ❌ |
-| `/api/auth/me` | GET | Get user profile | ✅ |
-| `/api/auth/sign-out` | POST | Logout | ✅ |
+| Endpoint                    | Method | Description             | Auth Required |
+| --------------------------- | ------ | ----------------------- | ------------- |
+| `/api/auth/sign-up`         | POST   | Create account          | ❌            |
+| `/api/auth/sign-in`         | POST   | Login                   | ❌            |
+| `/api/auth/verify-code`     | POST   | Verify OTP              | ❌            |
+| `/api/auth/forgot-password` | POST   | Request password reset  | ❌            |
+| `/api/auth/reset-password`  | POST   | Complete password reset | ❌            |
+| `/api/auth/me`              | GET    | Get user profile        | ✅            |
+| `/api/auth/sign-out`        | POST   | Logout                  | ✅            |
 
 ### Example: Sign Up
+
 ```bash
 curl -X POST http://localhost:3000/api/auth/sign-up \
   -H "Content-Type: application/json" \
@@ -188,6 +205,7 @@ curl -X POST http://localhost:3000/api/auth/sign-up \
 ```
 
 Response:
+
 ```json
 {
   "success": true,
@@ -201,7 +219,9 @@ Response:
 ```
 
 ### Rate Limit Headers
+
 Every response includes:
+
 ```
 X-RateLimit-Limit: 5
 X-RateLimit-Remaining: 2
@@ -209,6 +229,7 @@ X-RateLimit-Reset: 2024-04-11T10:30:00Z
 ```
 
 When limit exceeded (429):
+
 ```
 Retry-After: 300
 ```
@@ -216,11 +237,13 @@ Retry-After: 300
 ## Testing
 
 ### Run All Tests
+
 ```bash
 npm test
 ```
 
 ### Unit Tests
+
 ```bash
 npm run test:unit
 
@@ -231,6 +254,7 @@ npm run test:coverage
 Test files in: `__tests__/unit/`
 
 ### Integration Tests
+
 ```bash
 npm run test:integration
 ```
@@ -238,6 +262,7 @@ npm run test:integration
 Test files in: `__tests__/integration/`
 
 ### End-to-End Tests (Playwright)
+
 ```bash
 npm run test:e2e
 
@@ -251,6 +276,7 @@ npm run test:e2e:debug
 Test files in: `__tests__/e2e/`
 
 ### Load Testing (k6)
+
 ```bash
 npm run test:load
 ```
@@ -295,6 +321,7 @@ npm start
    ```
 
 ### Database Setup
+
 ```bash
 # Baseline existing database (if migrating)
 npx prisma migrate resolve --applied migration_name
@@ -304,11 +331,13 @@ npx prisma migrate deploy
 ```
 
 ### GitHub Actions CI/CD
+
 Automatic testing and deployment on push/PR. See `.github/workflows/ci-cd.yml`.
 
 ## Security
 
 ### 🔐 JWT & Authentication
+
 - ✅ Tokens stored in **HttpOnly cookies only** (no JSON response exposure)
 - ✅ **Secure flag** enabled in production (HTTPS-only)
 - ✅ **SameSite: Strict** for CSRF protection (was "lax", now "strict")
@@ -316,6 +345,7 @@ Automatic testing and deployment on push/PR. See `.github/workflows/ci-cd.yml`.
 - ✅ **Session invalidation** on logout
 
 ### 🔒 Password Security
+
 - ✅ **Bcrypt hashing** with 12 salt rounds
 - ✅ **8-128 character** requirement
 - ✅ **Password reset** via verified email only
@@ -323,12 +353,14 @@ Automatic testing and deployment on push/PR. See `.github/workflows/ci-cd.yml`.
 - ✅ **Cleartext never stored**
 
 ### 📧 Email Verification
+
 - ✅ **OTP-based** verification (5-minute validity)
 - ✅ **Required for login** (emailVerified: true)
 - ✅ **SHA-256 hashed** tokens in database
 - ✅ **99.9% uptime** Brevo email service
 
 ### 🚫 Rate Limiting (Distributed)
+
 - ✅ **Upstash Redis** (multi-instance safe)
 - ✅ **Per-IP + per-account** limits
 - ✅ **Adaptive by endpoint** (signup: 5, signin: 8)
@@ -336,6 +368,7 @@ Automatic testing and deployment on push/PR. See `.github/workflows/ci-cd.yml`.
 - ✅ **Global limit** 1000req/min/IP
 
 ### 📂 Database
+
 - ✅ **Parameterized queries** (Prisma ORM, no SQL injection)
 - ✅ **ACID transactions**
 - ✅ **Row-level security** (Postgres)
@@ -343,6 +376,7 @@ Automatic testing and deployment on push/PR. See `.github/workflows/ci-cd.yml`.
 - ✅ **Automatic backups** (Neon recommended)
 
 ### 🌐 API Security
+
 - ✅ **Input validation** (Zod schemas)
 - ✅ **CORS configured**
 - ✅ **Security headers** implemented
@@ -350,6 +384,7 @@ Automatic testing and deployment on push/PR. See `.github/workflows/ci-cd.yml`.
 - ✅ **HTTPS enforced** in production
 
 ### 📋 Security Headers
+
 ```
 X-Content-Type-Options: nosniff
 X-Frame-Options: DENY
@@ -368,7 +403,7 @@ Before deploying to production, complete:
 - [ ] Rate limits tuned for expected traffic
 - [ ] Email service tested (send test email)
 - [ ] Error monitoring configured (Sentry)
-- [ ] Backups enabled  
+- [ ] Backups enabled
 - [ ] CDN/cache configured
 - [ ] Security headers verified
 - [ ] All tests passing
@@ -381,13 +416,15 @@ Before deploying to production, complete:
 ## Monitoring
 
 ### Recommended Tools
+
 - **Error Tracking**: [Sentry](https://sentry.io)
-- **Performance**: [Vercel Analytics](https://vercel.com/analytics)  
+- **Performance**: [Vercel Analytics](https://vercel.com/analytics)
 - **Logging**: Winston/Pino
 - **Monitoring**: Datadog, New Relic, or Prometheus
 - **Uptime**: UptimeRobot, Pingdom
 
 ### Key Metrics to Track
+
 - API response times
 - Error rate and types
 - Rate limit hit rate
@@ -398,12 +435,14 @@ Before deploying to production, complete:
 ## Contributing
 
 ### Code Standards
+
 - ESLint: `npm run lint`
 - Format: `npm run format`
 - Tests: `npm test`
 - Build: `npm run build`
 
 ### Git Workflow
+
 1. Create feature branch: `git checkout -b feature/your-feature`
 2. Make changes and commit with conventional commits
 3. Push and create Pull Request

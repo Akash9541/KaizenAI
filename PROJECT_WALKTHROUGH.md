@@ -25,6 +25,7 @@
 ### What is this project?
 
 **AI Career Coach** is a full-stack web application that helps professionals with:
+
 - 📄 **Resume Building** - AI-powered resume generation and editing
 - 💌 **Cover Letter Creation** - Personalized cover letter generation
 - 🎤 **Interview Preparation** - Mock interviews and interview coaching
@@ -124,6 +125,7 @@ Deployment:   Vercel
 ### 📁 Root Configuration Files
 
 #### `next.config.mjs`
+
 ```javascript
 // Next.js configuration
 // Features:
@@ -133,6 +135,7 @@ Deployment:   Vercel
 ```
 
 #### `tailwind.config.mjs`
+
 ```javascript
 // Tailwind CSS configuration
 // - Custom colors (gradient theme)
@@ -141,6 +144,7 @@ Deployment:   Vercel
 ```
 
 #### `jest.config.js`
+
 ```javascript
 // Jest testing configuration
 // - testEnvironment: 'node' for API tests
@@ -149,6 +153,7 @@ Deployment:   Vercel
 ```
 
 #### `playwright.config.ts`
+
 ```typescript
 // Playwright E2E testing configuration
 // - Browsers: Chromium, Firefox, WebKit
@@ -167,26 +172,26 @@ Deployment:   Vercel
 
 ```javascript
 // OTP Configuration
-export const OTP_EXPIRY_MINUTES = 5;           // OTP valid for 5 minutes
-export const OTP_LENGTH = 6;                   // 6-digit OTP
-export const OTP_REGEX = /^\d{6}$/;           // Validation regex
+export const OTP_EXPIRY_MINUTES = 5; // OTP valid for 5 minutes
+export const OTP_LENGTH = 6; // 6-digit OTP
+export const OTP_REGEX = /^\d{6}$/; // Validation regex
 
 // JWT Configuration
-export const JWT_AUTH_TTL_SECONDS = 604800;   // 7 days
+export const JWT_AUTH_TTL_SECONDS = 604800; // 7 days
 export const AUTH_COOKIE_NAME = "auth_token"; // Cookie name
 
 // Rate Limiting by endpoint
 export const RATE_LIMITS = {
-  SIGN_UP: { limit: 5, window: 10 * 60 * 1000 },        // 5 per 10min
-  SIGN_IN: { limit: 8, window: 10 * 60 * 1000 },        // 8 per 10min
-  VERIFY_CODE: { limit: 10, window: 10 * 60 * 1000 },   // 10 per 10min
+  SIGN_UP: { limit: 5, window: 10 * 60 * 1000 }, // 5 per 10min
+  SIGN_IN: { limit: 8, window: 10 * 60 * 1000 }, // 8 per 10min
+  VERIFY_CODE: { limit: 10, window: 10 * 60 * 1000 }, // 10 per 10min
   RESET_PASSWORD: { limit: 8, window: 10 * 60 * 1000 }, // 8 per 10min
   FORGOT_PASSWORD: { limit: 5, window: 30 * 60 * 1000 }, // 5 per 30min
-  GLOBAL: { limit: 1000, window: 1 * 60 * 1000 }        // 1000 per min
+  GLOBAL: { limit: 1000, window: 1 * 60 * 1000 }, // 1000 per min
 };
 
 // Account Lockout
-export const ACCOUNT_LOCKOUT_THRESHOLD = 5;     // After 5 failed attempts
+export const ACCOUNT_LOCKOUT_THRESHOLD = 5; // After 5 failed attempts
 export const ACCOUNT_LOCKOUT_DURATION = 15 * 60 * 1000; // 15 minutes
 
 // Password Requirements
@@ -205,19 +210,21 @@ export const PASSWORD_MAX_LENGTH = 128;
 ```javascript
 // 1. PASSWORD HASHING
 export const hashPassword = async (password) => bcrypt.hash(password, 12);
-export const comparePassword = async (password, hash) => bcrypt.compare(password, hash);
+export const comparePassword = async (password, hash) =>
+  bcrypt.compare(password, hash);
 
-// Why bcrypt? 
+// Why bcrypt?
 // - Automatic salt generation
 // - Slow computation (12 rounds = ~100ms per hash)
 // - Resistant to brute force attacks
 // - Industry standard
 
 // 2. OTP GENERATION
-export const generateOtpCode = () => crypto.randomInt(100000, 1000000).toString();
+export const generateOtpCode = () =>
+  crypto.randomInt(100000, 1000000).toString();
 // Returns random 6-digit number
 
-export const getOtpExpiryDate = () => 
+export const getOtpExpiryDate = () =>
   new Date(Date.now() + OTP_TTL_SECONDS * 1000);
 // Returns expiry timestamp (uses constants)
 
@@ -236,12 +243,12 @@ export const hashOtpCode = ({ code, email, purpose }) => {
 // 4. JWT TOKEN CREATION
 export const createAuthToken = async (user) =>
   new SignJWT({
-    sub: user.id,                    // Subject (user ID)
+    sub: user.id, // Subject (user ID)
     email: user.email,
     name: user.name || user.email,
   })
     .setProtectedHeader({ alg: "HS256" })
-    .setExpirationTime(`${JWT_AUTH_TTL_SECONDS}s`)  // 7 days
+    .setExpirationTime(`${JWT_AUTH_TTL_SECONDS}s`) // 7 days
     .sign(getJwtSecret());
 
 // Why JWT?
@@ -252,9 +259,9 @@ export const createAuthToken = async (user) =>
 
 // 5. COOKIE MANAGEMENT (UPDATED)
 export const getAuthCookieOptions = () => ({
-  httpOnly: true,           // ✅ Can't access via JavaScript (XSS protection)
-  sameSite: "strict",       // ✅ CSRF protection (was "lax")
-  secure: process.env.NODE_ENV === "production",  // HTTPS only in prod
+  httpOnly: true, // ✅ Can't access via JavaScript (XSS protection)
+  sameSite: "strict", // ✅ CSRF protection (was "lax")
+  secure: process.env.NODE_ENV === "production", // HTTPS only in prod
   path: "/",
   maxAge: JWT_AUTH_TTL_SECONDS,
 });
@@ -269,9 +276,9 @@ export const getAuthCookieOptions = () => ({
 export const getSession = async () => {
   const cookieStore = await cookies();
   const token = cookieStore.get(AUTH_COOKIE_NAME)?.value;
-  
+
   if (!token) return null;
-  
+
   try {
     const { payload } = await jwtVerify(token, getJwtSecret());
     return {
@@ -280,12 +287,13 @@ export const getSession = async () => {
       name: payload.name,
     };
   } catch {
-    return null;  // Invalid token returns null
+    return null; // Invalid token returns null
   }
 };
 ```
 
 **Key Changes from Original**:
+
 - ✅ Uses `AUTH_COOKIE_NAME` from constants (was hardcoded)
 - ✅ `sameSite: "strict"` instead of "lax" (CSRF protection)
 - ✅ All config values imported from `lib/constants.js`
@@ -312,10 +320,10 @@ export const createRateLimiter = (options) => {
   return new Ratelimit({
     redis: Redis.fromEnv(),
     limiter: Ratelimit.slidingWindow(
-      options.limit,           // Max requests
-      options.window           // Time window (e.g., "10 m" for 10 minutes)
+      options.limit, // Max requests
+      options.window, // Time window (e.g., "10 m" for 10 minutes)
     ),
-    analytics: true,           // Track analytics
+    analytics: true, // Track analytics
     prefix: `@upstash/ratelimit`,
   });
 };
@@ -333,10 +341,10 @@ export const rateLimiters = {
 export const checkRateLimit = async ({ request, identifier, limiter }) => {
   try {
     const ip = getClientIp(request);
-    const key = `${identifier}:${ip}`;  // Rate limit per email + IP
-    
+    const key = `${identifier}:${ip}`; // Rate limit per email + IP
+
     const result = await limiter.limit(key);
-    
+
     return {
       allowed: result.success,
       remaining: result.remaining,
@@ -363,6 +371,7 @@ const getClientIp = (request) => {
 ```
 
 **Why Redis instead of in-memory?**
+
 - ✅ Distributed: Works across multiple server instances
 - ✅ Persistent: Survives server restarts
 - ✅ Scalable: Handles millions of requests
@@ -370,6 +379,7 @@ const getClientIp = (request) => {
 - ✅ Analytics: Built-in tracking and reporting
 
 **Sliding Window Algorithm**:
+
 ```
 Time:     |----10 minutes----|
 Requests: X X X X X X X X (8 requests)
@@ -394,8 +404,8 @@ const getFailedAttempts = async (email) => {
 export const recordFailedLoginAttempt = async (email) => {
   const key = `login_attempts:${email}`;
   await redis.incr(key);
-  await redis.expire(key, 3600);  // Expire after 1 hour
-  
+  await redis.expire(key, 3600); // Expire after 1 hour
+
   const attempts = await redis.get(key);
   if (attempts >= ACCOUNT_LOCKOUT_THRESHOLD) {
     // Lock account for 15 minutes
@@ -403,7 +413,7 @@ export const recordFailedLoginAttempt = async (email) => {
       `account_locked:${email}`,
       true,
       "EX",
-      ACCOUNT_LOCKOUT_DURATION / 1000
+      ACCOUNT_LOCKOUT_DURATION / 1000,
     );
   }
 };
@@ -429,6 +439,7 @@ export const clearLoginAttempts = async (email) => {
 ```
 
 **Brute Force Protection**:
+
 ```
 Attempt 1: ✅ Failed (1/5)
 Attempt 2: ✅ Failed (2/5)
@@ -460,33 +471,33 @@ model User {
   email     String   @unique
   name      String?
   industry  String?
-  
+
   // Authentication fields
   passwordHash            String?
   emailVerified           Boolean          @default(false)
   emailVerificationToken  String?          @unique
   emailVerificationExpiry DateTime?
-  
+
   // Security audit fields (NEW)
   lastLoginAt            DateTime?          // Track last successful login
   lastPasswordChangeAt   DateTime?          // Track password changes
   failedLoginAttempts    Int               @default(0)  // For lockout
   accountLockedUntil     DateTime?          // Lockout expiry
-  
+
   // Profile & skills
   experience  String?
   bio         String?
   skills      String[]          @default([])
-  
+
   // Relationships
   resumes     Resume[]
   coverLetters CoverLetter[]
   interviews  Interview[]
-  
+
   // Metadata
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
-  
+
   // Performance indexes (NEW)
   @@index([email])
   @@index([emailVerified])
@@ -496,13 +507,13 @@ model Resume {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   title     String
   content   String   @db.Text
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   @@index([userId])
 }
 
@@ -510,13 +521,13 @@ model CoverLetter {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   jobTitle  String
   content   String   @db.Text
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   @@index([userId])
 }
 
@@ -524,26 +535,26 @@ model Interview {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   topic     String
   level     String   // Beginner, Intermediate, Advanced
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   @@index([userId])
 }
 ```
 
 **Schema Design Decisions**:
 
-| Field | Why | Security Impact |
-|-------|-----|-----------------|
-| `emailVerified` | Prevents login before email verification | Prevents account takeover |
-| `failedLoginAttempts` | Tracks failed attempts | Enables lockout mechanism |
-| `accountLockedUntil` | Stores lockout expiry | Prevents brute force |
-| `lastLoginAt` | Audit trail | Detects suspicious activity |
-| Indexes on `email`, `emailVerified` | Speed up frequent queries | Better performance |
+| Field                               | Why                                      | Security Impact             |
+| ----------------------------------- | ---------------------------------------- | --------------------------- |
+| `emailVerified`                     | Prevents login before email verification | Prevents account takeover   |
+| `failedLoginAttempts`               | Tracks failed attempts                   | Enables lockout mechanism   |
+| `accountLockedUntil`                | Stores lockout expiry                    | Prevents brute force        |
+| `lastLoginAt`                       | Audit trail                              | Detects suspicious activity |
+| Indexes on `email`, `emailVerified` | Speed up frequent queries                | Better performance          |
 
 ---
 
@@ -555,7 +566,11 @@ model Interview {
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/prisma";
-import { comparePassword, createAuthToken, getAuthCookieOptions } from "@/lib/auth";
+import {
+  comparePassword,
+  createAuthToken,
+  getAuthCookieOptions,
+} from "@/lib/auth";
 import { checkRateLimit, rateLimiters } from "@/lib/rate-limit-redis";
 import { AUTH_COOKIE_NAME } from "@/lib/constants";
 
@@ -581,10 +596,10 @@ export async function POST(request) {
     if (!rateLimit.allowed) {
       return NextResponse.json(
         { error: "Too many requests" },
-        { 
+        {
           status: 429,
-          headers: { "Retry-After": String(rateLimit.retryAfterSeconds) }
-        }
+          headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
+        },
       );
     }
 
@@ -597,13 +612,13 @@ export async function POST(request) {
     if (!rateLimit.allowed) {
       return NextResponse.json(
         { error: "Too many login attempts" },
-        { 
+        {
           status: 429,
           headers: {
             "Retry-After": String(rateLimit.retryAfterSeconds),
             "X-RateLimit-Remaining": String(rateLimit.remaining),
-          }
-        }
+          },
+        },
       );
     }
 
@@ -612,10 +627,10 @@ export async function POST(request) {
     if (lockState.isLocked) {
       return NextResponse.json(
         { error: "Account temporarily locked" },
-        { 
+        {
           status: 429,
-          headers: { "Retry-After": String(lockState.retryAfterSeconds) }
-        }
+          headers: { "Retry-After": String(lockState.retryAfterSeconds) },
+        },
       );
     }
 
@@ -629,7 +644,7 @@ export async function POST(request) {
       await recordFailedLoginAttempt(normalizedEmail);
       return NextResponse.json(
         { error: "Invalid email or password" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -637,7 +652,7 @@ export async function POST(request) {
     if (!user.emailVerified) {
       return NextResponse.json(
         { error: "Email is not verified" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -647,7 +662,7 @@ export async function POST(request) {
       await recordFailedLoginAttempt(normalizedEmail);
       return NextResponse.json(
         { error: "Invalid email or password" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -675,7 +690,7 @@ export async function POST(request) {
           emailVerified: user.emailVerified,
         },
       },
-      { status: 200 }
+      { status: 200 },
     );
 
     // 12. Set secure HttpOnly cookie
@@ -686,13 +701,14 @@ export async function POST(request) {
     console.error("Sign in error:", error);
     return NextResponse.json(
       { error: "Authentication failed" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 ```
 
 **Request Flow**:
+
 ```
 POST /api/auth/sign-in
 ├─ Validate email & password (Zod)
@@ -749,8 +765,8 @@ export async function POST(request) {
       data: {
         email: email.toLowerCase(),
         name,
-        passwordHash,  // Password hashed but NOT verified yet
-        emailVerified: false,  // ← KEY: Not verified until OTP confirmation
+        passwordHash, // Password hashed but NOT verified yet
+        emailVerified: false, // ← KEY: Not verified until OTP confirmation
         emailVerificationToken: verificationToken,
         emailVerificationExpiry: getOtpExpiryDate(),
       },
@@ -772,6 +788,7 @@ export async function POST(request) {
 ```
 
 **Why password is hashed before verification?**
+
 - ✅ Prepare it early
 - ✅ But don't set `emailVerified = true` until OTP verified
 - ✅ If user doesn't verify email, account never becomes active
@@ -804,15 +821,18 @@ export async function POST(request) {
     }
 
     // 3. Check OTP expiry
-    if (!user.emailVerificationExpiry || user.emailVerificationExpiry < new Date()) {
+    if (
+      !user.emailVerificationExpiry ||
+      user.emailVerificationExpiry < new Date()
+    ) {
       return NextResponse.json({ error: "OTP expired" }, { status: 410 });
     }
 
     // 4. Verify OTP hash
-    const hashedOtp = hashOtpCode({ 
-      code: data.code, 
-      email: normalizedEmail, 
-      purpose: data.purpose 
+    const hashedOtp = hashOtpCode({
+      code: data.code,
+      email: normalizedEmail,
+      purpose: data.purpose,
     });
 
     if (hashedOtp !== user.emailVerificationToken) {
@@ -823,7 +843,7 @@ export async function POST(request) {
     await db.user.update({
       where: { id: user.id },
       data: {
-        emailVerified: true,  // ← NOW set to true after OTP verification
+        emailVerified: true, // ← NOW set to true after OTP verification
         emailVerificationToken: null,
         emailVerificationExpiry: null,
       },
@@ -833,7 +853,9 @@ export async function POST(request) {
     const token = await createAuthToken(user);
     const response = NextResponse.json({
       success: true,
-      user: { /* ... */ },
+      user: {
+        /* ... */
+      },
     });
     response.cookies.set(AUTH_COOKIE_NAME, token, getAuthCookieOptions());
     return response;
@@ -844,10 +866,11 @@ export async function POST(request) {
 ```
 
 **OTP Verification Flow**:
+
 ```
 1. User signs up
    → Pass: hashed, emailVerified: false
-   
+
 2. OTP sent to email
 
 3. User enters OTP code
@@ -878,7 +901,7 @@ export async function POST(request) {
 
 export default function Header() {
   const router = useRouter();
-  const [user, setUser] = useState(undefined);  // undefined = loading
+  const [user, setUser] = useState(undefined); // undefined = loading
   const [mounted, setMounted] = useState(false);
 
   // Hydration safety: only render on client
@@ -910,7 +933,9 @@ export default function Header() {
     };
 
     loadUser();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [mounted]);
 
   // FIX: Growth Tools dropdown now OUTSIDE the user conditional
@@ -1011,9 +1036,9 @@ export default function Header() {
 ```
 
 **Why the FIX works**:
+
 - ❌ **Before**: Growth Tools inside `{mounted && user ? ... }`
   - Dropdown hidden until user data loads from API (~1-2 sec)
-  
 - ✅ **After**: Growth Tools OUTSIDE the conditional
   - Dropdown visible immediately after login
   - Doesn't wait for /api/auth/me to complete
@@ -1066,7 +1091,7 @@ export async function getUserOnboardingStatus() {
 
   try {
     return {
-      isOnboarded: !!user?.industry,  // true if industry is set
+      isOnboarded: !!user?.industry, // true if industry is set
     };
   } catch {
     throw new Error("Failed to check status");
@@ -1075,6 +1100,7 @@ export async function getUserOnboardingStatus() {
 ```
 
 **Server Actions Benefits**:
+
 - ✅ **Type Safety**: Return types checked at compile time
 - ✅ **No API needed**: Direct database access
 - ✅ **Automatic serialization**: Objects converted to JSON automatically
@@ -1096,7 +1122,8 @@ export const withRateLimit = (limiter) => {
   return async (handler) => {
     return async (request) => {
       // 1. Get client IP
-      const ip = request.headers.get("x-forwarded-for")?.split(",")[0] || "unknown";
+      const ip =
+        request.headers.get("x-forwarded-for")?.split(",")[0] || "unknown";
 
       // 2. Check global rate limit first
       let result = await checkRateLimit({
@@ -1108,15 +1135,15 @@ export const withRateLimit = (limiter) => {
       if (!result.allowed) {
         return NextResponse.json(
           { error: "Rate limit exceeded" },
-          { 
+          {
             status: 429,
             headers: {
               "X-RateLimit-Limit": String(result.limit),
               "X-RateLimit-Remaining": String(result.remaining),
               "X-RateLimit-Reset": result.reset.toISOString(),
               "Retry-After": String(result.retryAfterSeconds),
-            }
-          }
+            },
+          },
         );
       }
 
@@ -1130,10 +1157,10 @@ export const withRateLimit = (limiter) => {
       if (!result.allowed) {
         return NextResponse.json(
           { error: "Too many requests" },
-          { 
+          {
             status: 429,
-            headers: { "Retry-After": String(result.retryAfterSeconds) }
-          }
+            headers: { "Retry-After": String(result.retryAfterSeconds) },
+          },
         );
       }
 
@@ -1169,8 +1196,8 @@ describe("Authentication Utilities", () => {
     it("should hash password and verify it", async () => {
       const password = "SecurePassword123!";
       const hash = await hashPassword(password);
-      
-      expect(hash).not.toBe(password);  // Hashed, not plain text
+
+      expect(hash).not.toBe(password); // Hashed, not plain text
       const isValid = await comparePassword(password, hash);
       expect(isValid).toBe(true);
     });
@@ -1186,13 +1213,13 @@ describe("Authentication Utilities", () => {
   describe("generateOtpCode", () => {
     it("should generate 6-digit OTP", () => {
       const otp = generateOtpCode();
-      expect(otp).toMatch(/^\d{6}$/);  // Matches /^\d{6}$/
+      expect(otp).toMatch(/^\d{6}$/); // Matches /^\d{6}$/
     });
 
     it("should generate different OTPs", () => {
       const otp1 = generateOtpCode();
       const otp2 = generateOtpCode();
-      expect(otp1).not.toBe(otp2);  // Different each time
+      expect(otp1).not.toBe(otp2); // Different each time
     });
   });
 
@@ -1202,7 +1229,7 @@ describe("Authentication Utilities", () => {
       const token1 = generateEmailVerificationToken();
       const token2 = generateEmailVerificationToken();
       expect(token1).not.toBe(token2);
-      expect(token1).toHaveLength(64);  // 32 bytes -> 64 hex chars
+      expect(token1).toHaveLength(64); // 32 bytes -> 64 hex chars
     });
   });
 });
@@ -1450,6 +1477,7 @@ test.describe("Sign In Flow", () => {
 ```
 
 **Foreign Key Constraints**:
+
 - User → Resume: `onDelete: Cascade` (delete all resumes if user deleted)
 - User → CoverLetter: `onDelete: Cascade`
 - User → Interview: `onDelete: Cascade`
@@ -1459,6 +1487,7 @@ test.describe("Sign In Flow", () => {
 ## API Response Patterns
 
 ### Success Response (200 OK)
+
 ```json
 {
   "success": true,
@@ -1472,6 +1501,7 @@ X-RateLimit-Reset: 2026-04-12T19:00:00Z
 ```
 
 ### Error Response (4XX/5XX)
+
 ```json
 {
   "error": "Error message",
@@ -1489,29 +1519,34 @@ X-RateLimit-Remaining: 0
 ## Security Checklist
 
 ✅ **Authentication**
+
 - JWTs signed and verified
 - HttpOnly cookies (XSS protection)
 - SameSite: strict (CSRF protection)
 - Password hashed with bcryptjs
 
 ✅ **Rate Limiting**
+
 - Global: 1000 req/min per IP
 - Sign-in: 8 attempts / 10 min
 - Sign-up: 5 attempts / 10 min
 - OTP verify: 10 attempts / 10 min
 
 ✅ **Account Lockout**
+
 - 5 failed logins → 15 min lockout
 - Failed attempts tracked in Redis
 - Cleared on successful login
 
 ✅ **Data Protection**
+
 - Email verification required before login
 - OTP expires after 5 minutes
 - Passwords never stored in plain text
 - OTP hashes prevent database compromise
 
 ✅ **Database**
+
 - Indexes on frequently queried fields (email, emailVerified)
 - Foreign key constraints with cascade delete
 - Audit fields (lastLoginAt, lastPasswordChangeAt)
@@ -1521,16 +1556,19 @@ X-RateLimit-Remaining: 0
 ## Performance Optimizations
 
 ### Database Queries
+
 - **Indexes**: email, emailVerified for quick lookups
 - **Query selection**: Only select needed fields
 - **Connection pooling**: Via Neon PostgreSQL (50 max connections)
 
 ### Caching
+
 - **Redis rate limiting**: In-memory, microsecond response time
 - **Session cookies**: No database query on every request
 - **Next.js ISR**: Incremental Static Regeneration for pages
 
 ### Frontend
+
 - **Code splitting**: Lazy load route components
 - **Image optimization**: Next.js Image component
 - **CSS**: Tailwind CSS purges unused styles at build time
@@ -1540,6 +1578,7 @@ X-RateLimit-Remaining: 0
 ## Deployment Architecture
 
 ### Development
+
 ```
 localhost:3000
   ├─ Next.js dev server (--turbopack)
@@ -1548,6 +1587,7 @@ localhost:3000
 ```
 
 ### Staging
+
 ```
 Vercel (staging branch)
   ├─ Built with Next.js build
@@ -1557,6 +1597,7 @@ Vercel (staging branch)
 ```
 
 ### Production
+
 ```
 Vercel (main branch)
   ├─ Built with optimizations
@@ -1567,6 +1608,7 @@ Vercel (main branch)
 ```
 
 ### Services
+
 ```
 PostgreSQL (Neon):       Database & connection pooling
 Redis (Upstash):        Rate limiting & caching
@@ -1579,21 +1621,22 @@ Jobs (Inngest):         Background jobs
 
 ## Key Decisions & Rationale
 
-| Decision | Why | Benefit |
-|----------|-----|---------|
-| Store JWT in cookie, not localStorage | XSS vulnerability | Tokens can't be stolen via JS |
-| SameSite: strict instead of lax | CSRF attacks | Cookies only sent to same site |
-| Rate limit with Redis | Single instance limit | Works across multiple servers |
-| Prisma ORM | Type safety | Catches errors at compile time |
-| Server Actions | Reduces API boilerplate | Directly call server from client |
-| Playwright + Jest + k6 | 4-tier testing | Full coverage: unit, integration, E2E, load |
-| GitHub Actions CI/CD | Automated testing | Never deploy broken code |
+| Decision                              | Why                     | Benefit                                     |
+| ------------------------------------- | ----------------------- | ------------------------------------------- |
+| Store JWT in cookie, not localStorage | XSS vulnerability       | Tokens can't be stolen via JS               |
+| SameSite: strict instead of lax       | CSRF attacks            | Cookies only sent to same site              |
+| Rate limit with Redis                 | Single instance limit   | Works across multiple servers               |
+| Prisma ORM                            | Type safety             | Catches errors at compile time              |
+| Server Actions                        | Reduces API boilerplate | Directly call server from client            |
+| Playwright + Jest + k6                | 4-tier testing          | Full coverage: unit, integration, E2E, load |
+| GitHub Actions CI/CD                  | Automated testing       | Never deploy broken code                    |
 
 ---
 
 ## Extension Points (Future Features)
 
 ### 1. Social Login (OAuth)
+
 ```
 Add to: lib/auth.js
 - Google OAuth provider
@@ -1602,6 +1645,7 @@ Add to: lib/auth.js
 ```
 
 ### 2. Two-Factor Authentication
+
 ```
 Add to: lib/2fa.js
 - TOTP (Time-based OTP)
@@ -1610,6 +1654,7 @@ Add to: lib/2fa.js
 ```
 
 ### 3. Audit Logging
+
 ```
 Add to: prisma/schema.prisma
 - AuditLog model
@@ -1618,6 +1663,7 @@ Add to: prisma/schema.prisma
 ```
 
 ### 4. API Keys for Integrations
+
 ```
 Add to: prisma/schema.prisma
 - ApiKey model

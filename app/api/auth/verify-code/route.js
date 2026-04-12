@@ -1,11 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/prisma";
-import {
-  createAuthToken,
-  getAuthCookieOptions,
-  hashOtpCode,
-} from "@/lib/auth";
+import { createAuthToken, getAuthCookieOptions, hashOtpCode } from "@/lib/auth";
 import { checkRateLimit, rateLimiters } from "@/lib/rate-limit-redis";
 import { OTP_LENGTH, OTP_REGEX, AUTH_COOKIE_NAME } from "@/lib/constants";
 
@@ -41,7 +37,7 @@ export async function POST(request) {
             "X-RateLimit-Remaining": String(Math.max(0, rateLimit.remaining)),
             "X-RateLimit-Reset": rateLimit.reset.toISOString(),
           },
-        }
+        },
       );
     }
 
@@ -64,7 +60,7 @@ export async function POST(request) {
     ) {
       return NextResponse.json(
         { error: "Invalid or expired verification code" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -110,7 +106,7 @@ export async function POST(request) {
           emailVerified: updatedUser.emailVerified,
         },
       },
-      { status: 200 }
+      { status: 200 },
     );
     response.cookies.set(AUTH_COOKIE_NAME, token, getAuthCookieOptions());
     return response;
@@ -118,7 +114,7 @@ export async function POST(request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: error.issues[0]?.message || "Invalid verification data" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -126,13 +122,13 @@ export async function POST(request) {
     if (error?.message?.includes("Can't reach database server")) {
       return NextResponse.json(
         { error: "Database is temporarily unavailable. Please try again." },
-        { status: 503 }
+        { status: 503 },
       );
     }
 
     return NextResponse.json(
       { error: "Failed to verify code" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

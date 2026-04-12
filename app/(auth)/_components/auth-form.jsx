@@ -29,8 +29,7 @@ const formContent = {
   },
   "sign-up": {
     title: "Create your account",
-    description:
-      "Sign up with your details, then verify your email with OTP.",
+    description: "Sign up with your details, then verify your email with OTP.",
     submitLabel: "Create Account",
     endpoint: "/api/auth/sign-up",
     alternateLabel: "Sign in",
@@ -99,9 +98,9 @@ export default function AuthForm({ mode, redirectTo }) {
                 : {
                     email: formData.email,
                     password: formData.password,
-                  }
+                  },
           ),
-        }
+        },
       );
 
       const result = await response.json();

@@ -12,7 +12,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 export const metadata = {
   // metadataBase is required for OG/Twitter absolute image URLs to resolve correctly
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL || "https://ai-career-coach.vercel.app"
+    process.env.NEXT_PUBLIC_APP_URL || "https://ai-career-coach.vercel.app",
   ),
 
   // Title template: child pages set `title: "Dashboard"` → renders "Dashboard | AI Career Coach"
@@ -97,4 +97,3 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
-

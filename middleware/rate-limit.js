@@ -30,7 +30,7 @@ export const withRateLimit = (limiter) => {
                 "X-RateLimit-Limit": "1000",
                 "X-RateLimit-Remaining": "0",
               },
-            }
+            },
           );
         }
 
@@ -63,11 +63,11 @@ export const withRateLimit = (limiter) => {
                 "Retry-After": String(rateLimitResult.retryAfterSeconds),
                 "X-RateLimit-Limit": String(rateLimitResult.limit),
                 "X-RateLimit-Remaining": String(
-                  Math.max(0, rateLimitResult.remaining)
+                  Math.max(0, rateLimitResult.remaining),
                 ),
                 "X-RateLimit-Reset": rateLimitResult.reset.toISOString(),
               },
-            }
+            },
           );
         }
 
@@ -77,15 +77,15 @@ export const withRateLimit = (limiter) => {
         // Add rate limit headers to response
         response.headers.set(
           "X-RateLimit-Limit",
-          String(rateLimitResult.limit)
+          String(rateLimitResult.limit),
         );
         response.headers.set(
           "X-RateLimit-Remaining",
-          String(Math.max(0, rateLimitResult.remaining))
+          String(Math.max(0, rateLimitResult.remaining)),
         );
         response.headers.set(
           "X-RateLimit-Reset",
-          rateLimitResult.reset.toISOString()
+          rateLimitResult.reset.toISOString(),
         );
 
         return response;

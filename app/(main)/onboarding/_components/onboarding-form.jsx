@@ -43,9 +43,11 @@ const getInitialIndustryValues = (industryValue, industries) => {
 
   const [industryId, ...subIndustryParts] = industryValue.split("-");
   const subIndustrySlug = subIndustryParts.join("-");
-  const selectedIndustry = industries.find((industry) => industry.id === industryId);
+  const selectedIndustry = industries.find(
+    (industry) => industry.id === industryId,
+  );
   const matchingSubIndustry = selectedIndustry?.subIndustries.find(
-    (subIndustry) => slugify(subIndustry) === subIndustrySlug
+    (subIndustry) => slugify(subIndustry) === subIndustrySlug,
   );
 
   return {
@@ -59,10 +61,10 @@ const OnboardingForm = ({ industries, initialValues, isEditing = false }) => {
   const router = useRouter();
   const initialSelection = getInitialIndustryValues(
     initialValues?.industry,
-    industries
+    industries,
   );
   const [selectedIndustry, setSelectedIndustry] = useState(
-    initialSelection.selectedIndustry
+    initialSelection.selectedIndustry,
   );
 
   const {
@@ -112,7 +114,7 @@ const OnboardingForm = ({ industries, initialValues, isEditing = false }) => {
       toast.success(
         isEditing
           ? "Profile updated successfully!"
-          : "Profile completed successfully!"
+          : "Profile completed successfully!",
       );
       router.push("/dashboard");
       router.refresh();
@@ -143,7 +145,7 @@ const OnboardingForm = ({ industries, initialValues, isEditing = false }) => {
                 onValueChange={(value) => {
                   setValue("industry", value);
                   setSelectedIndustry(
-                    industries.find((ind) => ind.id === value)
+                    industries.find((ind) => ind.id === value),
                   );
                   setValue("subIndustry", "");
                 }}
@@ -249,8 +251,10 @@ const OnboardingForm = ({ industries, initialValues, isEditing = false }) => {
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Saving...
                 </>
+              ) : isEditing ? (
+                "Save Profile"
               ) : (
-                isEditing ? "Save Profile" : "Complete Profile"
+                "Complete Profile"
               )}
             </Button>
           </form>
